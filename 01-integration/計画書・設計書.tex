@@ -1,0 +1,1456 @@
+\documentclass[lualatex,book,paper=a4paper,jafontsize=11.5pt,jafontscale=1.05]{jlreq}
+
+%フォント:
+% \usepackage{luatexja-fontspec}
+\usepackage{hack-fonts}
+
+%表紙用:
+\usepackage{hack-cover}
+
+% リンク
+\usepackage[hidelinks]{hyperref}
+
+% 画像
+\usepackage{graphicx}
+
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{subcaption}
+
+\usetikzlibrary{arrows.meta, automata, positioning, shapes.geometric}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+
+
+\title{ハッカソン}
+\subtitle{～計画書と設計書～}
+\team{チーム4}
+\author{
+	      24G1061 : 酒井 睦基 \\
+        24G1089 : 武本 龍　 \\
+	      24G1122 : 細澤 悠真 \\
+        25G1062 : 佐藤 夏美 \\
+        25G1101 : 成毛 海人 \\
+        25G1130 : 山口 汐里
+        }
+\date{\today}
+\version{1.0}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\maketitle
+
+\setcounter{tocdepth}{2}
+\tableofcontents \thispagestyle{empty}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{プロジェクトの計画書} \label{chap:project-plan}\setcounter{page}{1}
+%%%%%%%%%%%%%%%%%%%%%%%%
+\section{プロジェクトの概要}
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{プロジェクトの題目}
+本プロジェクト「Arduinoオーケストラ」は、大学生のストレス回復を支援するための受動的環境介入装置であり，
+装置名は「Arduinoオーケストラ：きらきら星 輪唱演奏システム」とする．
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{プロジェクトの目的}
+大学生のメンタルヘルス不調は構造的な社会課題として定着しつつある．
+国内の大規模調査ではK-6抑うつ・不安尺度の集団平均が臨床的介入を要する水準に達しており\cite{ref:tanaka2020}，
+COVID-19以降の国際調査でも同様の傾向が確認されている\cite{ref:wathelet2020}．
+さらにメンタル不調による生産性損失は国内年間約7.6兆円（GDP比1.1\%）と推計され，
+精神疾患医療費の7倍以上に相当する\cite{ref:harada2025}．
+大学生期のメンタルヘルス支援は，こうした将来の社会的損失を予防する上流施策が求められている。
+しかし現行支援には3つの構造的問題がある．
+学生相談室は予約制でストレスにより自発性が低下した層に届きにくく\cite{ref:soudanshitsu}，
+メンタルケアアプリの媒体であるスマートフォン自体がSNS通知を通じて新たなストレス源となり\cite{ref:smartphone_stress}，
+カフェBGM等の商業空間音響は購買促進目的であり大学空間に常設されたストレス回復用音響環境は存在しない\cite{ref:usen}．
+本プロジェクトの目的は，複数のArduinoマイクロコントローラをI2Cハイブリッド同期方式で連携させ，
+童謡「きらきらぼし」を主旋律3パート（クラリネット・フルート・オルガン）＋ドラムで自動輪唱演奏する装置を開発することである．
+最終的なゴールは
+\textbf{受動性}（利用者の能動的操作を要求せず大学空間に常設可能）と
+\textbf{輪唱演奏としての成立}（第三者に「きらきらぼし」と識別される精度の同期演奏を実現）の2要件を同時に満たす環境的介入装置を実装することである．
+本装置の急性ストレス回復効果はIlie \& Rehana (2013)\cite{ref:ilie2013}が同楽曲で実証済みであり，
+本計画書では装置構築までを対象とし，社会的効果検証実験は将来研究として別途計画する．
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{既存の技術とプロジェクトの独自性}
+大学生メンタルヘルス支援および空間音響サービスの主要既存技術と，その構造的限界を表\ref{tab:existing}に示す．
+いずれも「受動性」と「大学空間対応」の双方を満たしておらず，本プロジェクトはこの空白を埋める．
+
+\begin{table}[h]
+\centering
+\caption{既存システムの構造的限界}
+\label{tab:existing}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{既存システム} & \textbf{構造的限界} \\
+\hline
+学生相談室・カウンセリング & 予約制・能動的アクセス前提，スティグマの壁 \\
+メンタルケアアプリ & スマホ自体がSNS通知等でストレス源 \\
+集中BGM（Spotify等） & イヤホンは個人完結型で空間介入ではない \\
+カフェ・店舗BGM（USEN等） & 購買促進目的，大学空間向けではない \\
+\hline
+\end{tabular}
+\end{table}
+
+本プロジェクトの独自性は次の2点である．
+第一に，受動的環境介入として大学空間に常設され，利用者の能動的操作を一切要求しない点で，
+既存支援に存在しない「大学の空間$\times$受動的」象限の空白を埋める．
+第二に，輪唱という同一旋律が時間差で重なる持続的音響テクスチャは，作業中BGMとして単調すぎず刺激的すぎない持続性を持ち，
+かつ複数Arduinoの同期演奏により音響的な他者の存在感を空間内に生成する．
+これは既存BGMサービスには存在しない介入カテゴリである．
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\section{スコープ・マネジメント}
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{成果物}
+本プロジェクトの主要成果物は次の2点である．
+\begin{enumerate}
+    \item \textbf{ハードウェア}: 指揮者Arduino 1台＋楽器スレーブ3台（フルート／クラリネット／オルガン）＋
+    リズムスレーブ1台（ドラム）の計5台構成による自動輪唱演奏装置．I2C有線マスタ／スレーブ方式で同期する．
+    \item \textbf{ソフトウェア}: Arduino側コード（楽譜保持・I2C同期・PLL補正・音符スケジューリング）および
+    Processing側コード（倍音加算合成・ADSRエンベロープ）一式．
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{プロジェクトの対象範囲と非対象範囲}
+本システムでは以下の項目を対象範囲として実装を進める．
+以下に列挙した項目以外の機能・検証・成果物は本プロジェクトの対象外とする．
+
+\begin{itemize}
+    \item Arduino 5台構成による「きらきら星」12小節（4/4拍子）の自動輪唱演奏装置の設計・実装．
+    \item I2Cハイブリッド同期方式（小節頭SYNCマーカー＋PLL位相補正）の実装．
+    \item クラリネット・フルート・オルガン・ドラムの倍音加算合成による音色実装．
+    \item ポテンショメータによる可変テンポ制御（BPM変更・PLL収束）の実装．
+    \item ロードセル検知・連続回転サーボモーターによるエンターテインメント機能の実装．
+    \item 装置単体での動作検証（同期精度・音響品質・連続演奏完走率）．
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{機能分解構造FBS}
+本システムは6つの主機能（F1〜F6）から構成される．
+各機能を表~\ref{tab:fbs_sum}に示す．
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{C{1.2cm}L{4cm}L{9cm}}
+  \toprule
+  \textbf{大項目} & \textbf{機能名} & \textbf{概要} \\
+  \midrule
+  F1 & 同期演奏機能 & I2C通信によるSYNCマーカー配信とPLL補正で全スレーブの小節タイミングを同期する \\
+  F2 & 可変テンポ管理機能 & ポテンショメータでBPMを取得し，変化制限とCONFIG配布でテンポを制御する \\
+  F3 & 演奏・スケジューリング機能 & PROGMEM格納の楽譜データをもとに音符スケジューリングと輪唱位置管理を行う \\
+  F4 & 音色合成機能 & 各楽器の倍音特性に基づく加算合成とADSRエンベロープでProcessing上に音色を再現する \\
+  F5 & エンターテインメント機能 & ロードセルによる荷重検知をトリガにサーボ回転演出と演奏開始を制御する \\
+  F6 & 通信機能 & I2C（Arduino間）とUSB Serial（Arduino-Processing間）の2系統で全ノードを接続する \\
+  \bottomrule
+\end{tabular}
+\caption{機能分解構造（FBS）概要}
+\label{tab:fbs_sum}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{製品分解構造PBS}
+6つの主機能は7つの製品（P1〜P7）から構成される．
+各製品を表~\ref{tab:pbs_sum}に示す．
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{C{1.2cm}L{4cm}L{9cm}}
+  \toprule
+  \textbf{大項目} & \textbf{製品名} & \textbf{概要} \\
+  \midrule
+  P1 & マスタシステム & Arduino Uno（マスタ）・ポテンショメータ・I2Cプルアップ抵抗で構成 \\
+  P2 & 楽器スレーブシステム & Arduino Uno×3（フルート/クラリネット/オルガン）とUSBケーブルで構成 \\
+  P3 & リズムスレーブシステム & Arduino Uno（ドラム）とUSBケーブルで構成 \\
+  P4 & エンターテインメント装置 & 連続回転サーボ・ロードセル＋HX711・アーム・台座で構成 \\
+  P5 & 音声合成PC & Processing実行PC（4インスタンス起動・音声出力） \\
+  P6 & 通信・電源インフラ & ジャンパーワイヤー（SDA/SCL）・I2Cプルアップ抵抗（2.2\,k$\Omega$×2本）・USB電源供給ケーブル \\
+  P7 & 筐体・ソフトウェア & Arduinoマウント筐体・Arduinoスケッチ・Processingスケッチ・楽譜データ \\
+  \bottomrule
+\end{tabular}
+\caption{製品分解構造（PBS）概要}
+\label{tab:pbs_sum}
+\end{table}
+
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{FBSとPBSの対応関係}
+主機能と製品の対応を表\ref{tab:fbs_pbs_sum}で示す．
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{C{1.2cm}L{4cm}L{8.5cm}}
+  \toprule
+  \textbf{FBS} & \textbf{機能名} & \textbf{対応PBS（実装先）} \\
+  \midrule
+  F1 & 同期演奏機能 & P1（マスタ）・P2・P3（スレーブ）・P6（I2Cバス） \\
+  F2 & 可変テンポ管理機能 & P1（マスタ）・P7（ソフトウェア一式） \\
+  F3 & 演奏・スケジューリング機能 & P2・P3（スレーブ）・P7（ソフトウェア一式） \\
+  F4 & 音色合成機能 & P5（Processing PC） \\
+  F5 & エンターテインメント機能 & P4（サーボ・ロードセル＋HX711・アーム・台座） \\
+  F6 & 通信機能 & P6（I2Cバス）・P2・P3（USBケーブル）・P5（Processing） \\
+  \bottomrule
+\end{tabular}
+\caption{FBS-PBS対応関係（概要）}
+\label{tab:fbs_pbs_sum}
+\end{table}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\section{作業計画}
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{作業分解構造WBSと管理番号}
+本システムを作成するための作業を3つの工程(WBS1〜WBS3)にわける．
+細かな作業も含めたものを表~\ref{tab:wbs}に示す．
+
+\begin{longtable}{C{1.2cm}L{4.5cm}C{1.8cm}C{1.2cm}C{1.5cm}L{3cm}}
+  \caption{作業分解構造（WBS）一覧}\label{tab:wbs}\\
+  \toprule
+  \textbf{WBS} & \textbf{作業名} & \textbf{担当} & \textbf{工数} & \textbf{期間} & \textbf{関連FBS/MOP} \\
+  \midrule
+  \endfirsthead
+  \toprule
+  \textbf{WBS} & \textbf{作業名} & \textbf{担当} & \textbf{工数} & \textbf{期間} & \textbf{関連FBS/MOP} \\
+  \midrule
+  \endhead
+  \midrule
+  \endfoot
+  \bottomrule
+  \endlastfoot
+  \multicolumn{6}{l}{\textbf{1：ハードウェアフェーズ(第4〜8週)}} \\
+  \midrule
+  1.1 & 機材調達・Arduino動作確認 & 全員 & 5h & 第4〜5週 & — \\
+  1.2 & 通信回路・音声出力回路構築 & 全員 & 2h & 第5〜6週 & F6.1, F6.2 / MOP2 \\
+  1.3 & ベビーメリー風装置の製作 & 全員 & 4h & 第6〜7週 & F5.1 \\
+  1.4 & ロードセル・HX711の取り付け・しきい値調整 & 全員 & 4h & 第7〜8週 & F5.2 \\
+  \midrule
+  \multicolumn{6}{l}{\textbf{2：ソフトウェアフェーズ(第6〜10週)}} \\
+  \midrule
+  \multicolumn{6}{l}{\textbf{2.1：Processing / 音色合成(第6〜9週)}}\\
+  \midrule
+  2.1 & 楽器別倍音比率の調査・データ化 & 全員 & 8h & 第6週 & F4.1〜F4.4 \\
+  2.1.1 & シリアル通信疎通確認 (115200bps) & 山口 & 3h & 第6〜7週 & F6.2 \\
+  2.1.2 & フルート音色作成 & 山口 & 10h & 第6〜8週 & F4.1 / MOP4 \\
+  2.1.3 & クラリネット音色作成 & 佐藤 & 10h & 第6〜8週 & F4.2 / MOP4 \\
+  2.1.4 & オルガン音色作成 & 成毛 & 10h & 第7〜8週 & F4.3 / MOP4 \\
+  2.1.5 & ドラム音色作成 & 成毛 & 10h & 第6〜8週 & F4.4 / MOP4 \\
+  2.1.6 & Serial通信・制御ロジック実装 & 佐藤\&山口 & 10h & 第6〜8週 & F4.6 / MOP2 \\
+  \midrule
+  \multicolumn{6}{l}{\textbf{2.2：マスタ側(第6〜9週)}} \\
+  \midrule
+  2.2 & センサ入力・BPM変換処理 (EMA+デッドバンド+×10整数化) & 成毛 & 8h & 第6〜8週 & F2.1 / MOP6 \\
+  2.2.1 & BPM変化制限ロジック & 成毛 & 5h & 第7〜8週 & F2.2 / MOP6, MOP7 \\
+  2.2.2 & CONFIG送信処理 & 佐藤\&山口 & 6h & 第7〜8週 & F2.3 \\
+  2.2.3 & SYNCマーカー生成・送信処理 & 佐藤\&山口 & 10h & 第7〜8週 & F1.1 / MOP1 \\
+  2.2.4 & START/STOP制御処理 & 佐藤(センサ側)山口(I2C側) & 6h & 第7〜8週 & F1.5 / MOP2 \\
+  2.2.5 & サーボ制御・状態管理実装 (IDLE→PLAYING→FINISHED) & 佐藤\&山口 & 6h & 第8〜9週 & F5.1〜F5.4 \\
+  \midrule
+  \multicolumn{6}{l}{\textbf{2.3：スレーブ側(第5〜9週)}} \\
+  \midrule
+  2.3 & 共通ライブラリ整備 (PROGMEM+I2Cフレーム) & 成毛 & 10h & 第5〜6週 & F1.2, F3.1 \\
+  2.3.1 & ISR受信・デコード処理 (onReceive) & 佐藤\&山口 & 15h & 第6〜8週 & F1.2 / MOP2 \\
+  2.3.2 & PLL同期アルゴリズム実装 (補正0.3+50msスナップ) & 佐藤\&山口 & 10h & 第7〜9週 & F1.3 / MOP1, MOP7 \\
+  2.3.3 & 音符スケジューリング (PROGMEM→Serial) & 各楽器担当 & 6h & 第7〜9週 & F3.2 / MOP1 \\
+  2.3.4 & 輪唱位置管理 (my\_local\_bar計算) & 各楽器担当 & 12h & 第7〜9週 & F3.3 / MOP1, MOP2 \\
+  \midrule
+  \multicolumn{6}{l}{\textbf{3：統合・評価フェーズ(第8〜11週)}} \\
+  \midrule
+  3.1 & 単体・同期精度テスト & 全員 & 8h & 第8〜9週 & F1.4, F4全般 / MOP1, MOP7 \\
+  3.2 & 全体結合演奏テスト & 全員 & 10h & 第9〜10週 & F1, F3, F4 / MOP1, MOP2 \\
+  3.3 & 可変テンポ動作検証 & 全員 & 9h & 第10週 & F3.6, F1.4 / MOP6, MOP7 \\
+  3.4 & 最終発表・報告 (アンケート集計) & 全員 & — & 第10〜11週 & MOP3, MOP4, MOP5 \\
+  \midrule
+  \multicolumn{6}{r}{\textbf{合計工数(全員・個人タスク含む)：約206h}} \\
+\end{longtable}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{アローダイアグラムとクリティカルパス}
+\begin{figure}[htbp]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+    node distance=1.5cm,
+    task/.style={rectangle, draw, minimum width=1.6cm, minimum height=0.9cm, align=center, font=\footnotesize, rounded corners=2pt},
+    critical/.style={rectangle, draw, fill=red!20, very thick, minimum width=1.6cm, minimum height=0.9cm, align=center, font=\footnotesize, rounded corners=2pt},
+    arr/.style={->, thick, >=stealth},
+    crit_arr/.style={->, very thick, red, >=stealth}
+]
+
+% Row 1: HW
+\node[critical] (n11) {1.1\\5h};
+\node[critical, right=of n11] (n12) {1.2\\2h};
+\node[task, right=of n12] (n13) {1.3\\4h};
+\node[task, right=of n13] (n14) {1.4\\4h};
+
+% Row 2: Processing
+\node[task, below=1.5cm of n12] (n21) {2.1\\8h};
+\node[task, right=of n21] (n211) {2.1.1\\3h};
+\node[task, right=of n211] (n216) {2.1.2-2.1.5\\(並行)};
+\node[task, right=of n216] (n21x) {2.1.6\\10h};
+
+% Row 3: Master
+\node[task, below=1.5cm of n21] (n22) {2.2\\8h};
+\node[task, right=of n22] (n221) {2.2.1\\5h};
+\node[task, right=of n221] (n222) {2.2.2\\6h};
+\node[task, right=of n222] (n223) {2.2.3\\10h};
+\node[task, right=of n223] (n225) {2.2.5\\6h};
+
+% Row 4: Slave (Critical)
+\node[critical, below=1.5cm of n22] (n23) {2.3\\10h};
+\node[critical, right=of n23] (n231) {2.3.1\\15h};
+\node[critical, right=of n231] (n232) {2.3.2\\10h};
+\node[critical, right=of n232] (n233) {2.3.3\\6h};
+\node[critical, right=of n233] (n234) {2.3.4\\12h};
+
+% Row 5: Integration
+\node[critical, below=1.5cm of n23] (n31) {3.1\\8h};
+\node[critical, right=of n31] (n32) {3.2\\10h};
+\node[critical, right=of n32] (n33) {3.3\\9h};
+\node[critical, right=of n33] (n34) {3.4\\---};
+
+% HW
+\draw[crit_arr] (n11) -- (n12);
+\draw[arr] (n12) -- (n13);
+\draw[arr] (n13) -- (n14);
+
+% 1.2 → 2.1（左下に分岐）
+\draw[arr] (n12.south) -- ([yshift=0.5cm]n21.north) -- (n21.north);
+% 1.2 → 2.2（左に大きく迂回してから下）
+\draw[arr] (n12.west) -- ++(-0.5,0) |- (n22.west);
+% 1.2 → 2.3 クリティカル（左にさらに大きく迂回してから下）
+\draw[crit_arr] ([yshift=-0.2cm]n12.west) -- ++(-1.0,0) |- (n23.west);
+
+% Processing
+\draw[arr] (n21) -- (n211);
+\draw[arr] (n211) -- (n216);
+\draw[arr] (n216) -- (n21x);
+
+% Master
+\draw[arr] (n22) -- (n221);
+\draw[arr] (n221) -- (n222);
+\draw[arr] (n222) -- (n223);
+\draw[arr] (n223) -- (n225);
+
+% 1.4 → 2.2.5（右側を迂回）
+\draw[arr] (n14.east) -- ++(0.5,0) |- (n225.east);
+
+% Slave (critical)
+\draw[crit_arr] (n23) -- (n231);
+\draw[crit_arr] (n231) -- (n232);
+\draw[crit_arr] (n232) -- (n233);
+\draw[crit_arr] (n233) -- (n234);
+
+% 2.3.4 → 3.1（クリティカル：左下に折れて3.1の上に入る）
+\draw[crit_arr] (n234.south) -- ++(0,-0.4) -| (n31.north);
+
+% 2.1.6 → 3.1（右端を大きく迂回）
+\draw[arr] (n21x.east) -- ++(1.5,0) |- (n31.east);
+
+% 2.2.5 → 3.1（右端を迂回、別高さ）
+\draw[arr] (n225.east) -- ++(1.0,0) |- ([yshift=0.15cm]n31.east);
+
+% Integration (critical)
+\draw[crit_arr] (n31) -- (n32);
+\draw[crit_arr] (n32) -- (n33);
+\draw[crit_arr] (n33) -- (n34);
+
+\end{tikzpicture}
+}
+\caption{WBSアローダイアグラム（赤色がクリティカルパス）}
+\label{fig:arrow}
+\end{figure}
+
+\paragraph{クリティカルパス}
+本プロジェクトのクリティカルパスは
+\textbf{1.1 → 1.2 → 2.3 → 2.3.1 → 2.3.2 → 2.3.3 → 2.3.4 → 3.1 → 3.2 → 3.3 → 3.4}
+であり，総工数は約87時間である．
+このパス上のタスクが遅延すると全体スケジュールが直接影響を受けるため，
+特にスレーブ側のソフトウェア実装（2.3〜2.3.4，計53時間）を優先的に進める必要がある．
+
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{役割分担}
+本プロジェクトの開発は，ハードウェア・ソフトウェア・統合の3工程に分けて並行進行させる．
+各工程をさらに細分化し，担当者を明記する．
+
+\paragraph{ハードウェア工程（WBS 1番台）}
+機材調達・動作確認，I2C通信回路・音声出力回路の構築，筐体制作から構成される．
+「機材調達・Arduino動作確認」（WBS 1.1）は全員で実施．Arduino Uno 5台と表\ref{tab:parts}の部品を発注・受領する．
+「通信回路・音声出力回路構築」（WBS 1.2）は全員でI2Cプルアップとブレッドボード配線を実装する．
+「ベビーメリー風装置の製作」（WBS 1.3）は全員でサーボ・アーム・台座を制作する．
+「ロードセル・HX711の取り付け・しきい値調整」（WBS 1.4）は全員でセンサ取り付けと実測調整を行う．
+
+\paragraph{ソフトウェア工程（WBS 2番台）}
+音響基礎リサーチ，マスタ側同期制御，スレーブ側演奏，Processing音声合成の4ブロックで構成される．
+「楽器別倍音比率の調査・データ化」（WBS 2.1）は全員で実施．佐藤（クラリネット），山口（フルート），成毛（オルガン・パーカッション）が各楽器の倍音比率を調査・データ化する．
+「Processing / 音色合成」（WBS 2.1番台）：\\
+シリアル通信疎通確認（2.1.1）を山口，
+フルート音色作成（2.1.2）を山口，
+クラリネット音色作成（2.1.3）を佐藤，
+オルガン音色作成（2.1.4）を成毛，
+ドラム音色作成（2.1.5）を成毛，
+Serial通信・制御ロジック実装（2.1.6）を佐藤・山口共同で担当．\\
+「マスタ側同期制御」（WBS 2.2番台）：\\
+センサ入力・BPM変換処理（2.2）とBPM変化制限ロジック（2.2.1）を成毛，
+CONFIG送信処理（2.2.2）とSYNCマーカー生成・送信処理（2.2.3）を佐藤・山口共同，
+START/STOP制御処理（2.2.4）を佐藤（センサ側）・山口（I2C側），
+サーボ制御・状態管理実装（2.2.5）を佐藤・山口共同で担当．\\
+「スレーブ側演奏」（WBS 2.3番台）：\\
+共通ライブラリ整備（2.3）を成毛，
+ISR受信・デコード処理（2.3.1）とPLL同期アルゴリズム実装（2.3.2）を佐藤・山口共同，
+音符スケジューリング（2.3.3）と輪唱位置管理（2.3.4）を各楽器担当（佐藤／山口／成毛）が自パートで担当．
+
+\paragraph{統合・評価・発表工程（WBS 3番台）}
+統合テスト，可変テンポ検証，最終発表から構成される．
+「単体・同期精度テスト」（WBS 3.1）は各楽器担当が自端末で，全員が同期計測で参加．
+「全体結合演奏テスト」（WBS 3.2）は全員．
+「可変テンポ動作検証」（WBS 3.3）は全員．
+「最終発表・報告」（WBS 3.4）は全員で資料作成・主観評価アンケート集計を行い発表する．
+
+\paragraph{PM・全体管理}
+PMは3年生3名（酒井・武本・細澤）が週単位でローテーションする．
+進捗管理（WBS番台ごとの実績工数 vs 見積もり），マイルストーン到達確認，週次MTG運営，リスク監視を担当．
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{ガントチャート}
+WBSに基づきタスクごとに担当を振り分けたガントチャートを図\ref{gantt}に示す．
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{fig/ganttchart.png}
+  \caption{Arduinoオーケストラ ガントチャート}
+  \label{gantt}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
+\section{検証と妥当性確認: V\&V計画}
+本節のV\&Vは「装置が設計通り動作するか」を対象とする．
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{プロジェクトの成果物に対する有効指標MOE}
+本プロジェクトの有効性指標（MOE）を表\ref{tab:moe}に示す．
+MOEはシステムが目的を達成できているかを評価する指標であり，4項目で構成する．
+
+\begin{table}[htbp]
+\centering
+\caption{有効性指標（MOE）一覧}
+\label{tab:moe}
+\begin{tabular}{C{1.5cm}L{5cm}}
+  \toprule
+  \textbf{MOE番号} & \textbf{指標}\\
+  \midrule
+  MOE1 & 輪唱演奏として音楽的に成立すること \\
+  MOE2 & 聴取者がきらきら星と識別できること \\
+  MOE3 & 聴取者がリラックスできること \\
+  MOE4 & センサによる可変テンポ制御が演奏中に機能すること \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{有効指標MOEに対応する性能指標MOP}
+各MOEに対応する性能指標（MOP）を表\ref{tab:mop}に示す．
+MOPはMOEを達成するための具体的な技術的測定値であり，単体・結合・システムの各テスト工程で測定と評価を行う．
+
+\begin{longtable}{C{1.2cm}L{3cm}L{3.5cm}L{3.5cm}L{3.5cm}}
+  \caption{性能指標（MOP）一覧}\label{tab:mop}\\
+  \toprule
+  \textbf{MOP番号} & \textbf{指標} & \textbf{目標値} & \textbf{根拠} & \textbf{測定方法} \\
+  \midrule
+  \endfirsthead
+  \toprule
+  \textbf{MOP番号} & \textbf{指標} & \textbf{目標値} & \textbf{根拠} & \textbf{測定方法} \\
+  \midrule
+  \endhead
+  \midrule
+  \endfoot
+  \bottomrule
+  \endlastfoot
+  \multicolumn{5}{l}{\textbf{MOE1（輪唱演奏の成立）}} \\
+  \midrule
+  MOP1 & 楽器間最大同期誤差 & $\leq 30$\,ms &
+    20〜30\,ms程度の誤差は許容範囲とされているため\cite{ref:lago} &
+    シリアルログで100小節分の小節頭タイミング誤差を計測 \\
+  MOP2 & 演奏完走率 & 10回連続完走 &
+    パケットロスや遅延等で演奏が停止しないことを確認するため &
+    5台接続で12小節輪唱を10回連続試行し全て完走すること \\
+  \midrule
+  \multicolumn{5}{l}{\textbf{MOE2（楽曲・楽器の識別）}} \\
+  \midrule
+  MOP3 & 楽曲識別率 & 平均$\geq 3.5$かつ標準偏差$\leq 1.0$ &
+    5段階評定尺度の中央値3.0を上回る水準として設定 &
+    主観評価アンケートQ「きらきら星と識別できたか」で集計 \\
+  MOP4 & 楽器識別率 & 平均$\geq 3.5$かつ標準偏差$\leq 1.0$ &
+    5段階評定尺度の中央値3.0を上回る水準として設定 &
+    主観評価アンケートQ「各楽器音が何の楽器か識別できたか」で集計 \\
+  \midrule
+  \multicolumn{5}{l}{\textbf{MOE3（リラクゼーション）}} \\
+  \midrule
+  MOP5 & リラクゼーション主観スコア & 平均$\geq 3.5$かつ標準偏差$\leq 1.0$ &
+    5段階評定尺度の中央値3.0を上回る水準として設定 &
+    5段階SD法アンケート（「この演奏を聴いてリラックスできましたか」） \\
+  \midrule
+  \multicolumn{5}{l}{\textbf{MOE4（可変テンポ制御）}} \\
+  \midrule
+  MOP6 & BPM変更反映速度 & 変更後1小節以内に全スレーブへ反映 &
+    設計上の制約（1小節あたり最大10BPM変化）から導出 &
+    BPM変更後の各スレーブのBPM適用タイミングをログで確認 \\
+  MOP7 & PLL収束速度 & 変化量（BPM）$\div 10$小節以内 &
+    設計上の制約（1小節最大10BPM変化）から導出 &
+    BPM急変後の同期誤差推移をシリアルログで計測 \\
+\end{longtable}
+
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{システムテストで評価する性能指標MOP}
+
+システム全体を統合した状態で評価するMOPを以下に示す．
+
+\begin{table}[htbp]
+\centering
+\caption{システムテストで評価するMOP}
+\label{tab:mop_system}
+\begin{tabular}{C{1.5cm}L{5cm}L{5cm}}
+  \toprule
+  \textbf{MOP番号} & \textbf{指標} & \textbf{評価タイミング} \\
+  \midrule
+  MOP2 & 演奏完走率 & 5台全接続・12小節輪唱10回連続試行時 \\
+  MOP3 & 楽曲識別率 & 最終デモ試聴アンケート時 \\
+  MOP4 & 楽器識別率 & 最終デモ試聴アンケート時 \\
+  MOP5 & リラクゼーション主観スコア & 最終デモ試聴アンケート時 \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{結合テストで評価する性能指標MOP}
+複数のArduinoを接続した状態で評価するMOPを以下に示す．
+
+\begin{table}[htbp]
+\centering
+\caption{結合テストで評価するMOP}
+\label{tab:mop_integration}
+\begin{tabular}{C{1.5cm}L{5cm}L{5cm}}
+  \toprule
+  \textbf{MOP番号} & \textbf{指標} & \textbf{評価タイミング} \\
+  \midrule
+  MOP1 & 楽器間最大同期誤差 & 5台接続・100小節ログ計測時 \\
+  MOP6 & BPM変更反映速度 & ポテンショメータ操作・BPM変更時 \\
+  MOP7 & PLL収束速度 & BPM急変後の収束確認時 \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{単体テストの合格基準}
+各コンポーネントを個別に評価する単体テストはMOPではないため，動作確認として以下の項目を検証する．
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{L{0.8cm}L{9.7cm}L{3cm}}
+  \toprule
+  \textbf{No.} & \textbf{テスト内容} & \textbf{合格基準} \\
+  \midrule
+  T-1 & マスタからSYNCコマンドを100回順次ユニキャストし，各スレーブの受信カウントをSerial経由で確認 & パケットロス0回 \\
+  T-2 & CONFIGコマンドを各スレーブへ順次ユニキャストし，正しいentry\_offsetを受信すること & 4スレーブ全て正常受信 \\
+  \bottomrule
+\end{tabular}
+\caption{通信疎通確認テスト仕様}
+\label{tab:test220}
+\end{table}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{プロジェクト中に監視する技術性能指標TPM}
+各MOPの達成に向けた開発途中の中間確認指標を以下に示す．
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{L{2cm}L{4cm}L{4cm}L{4.5cm}}
+  \toprule
+  \textbf{関連MOP} & \textbf{指標} & \textbf{閾値・基準} & \textbf{確認方法} \\
+  \midrule
+  MOP1 & 楽器間同期誤差 & $\leq 30$\,ms & シリアルログ計測 \\
+  MOP2 & I2C SYNCパケットロス率 & 0回（パケットロスなし） & 100回送信で受信カウント確認 \\
+  MOP3 & 楽曲識別の中間確認 & チーム内で識別できること & チーム内試聴確認 \\
+  MOP4 & 楽器識別の中間確認 & チーム内で識別できること & チーム内試聴確認 \\
+  MOP5 & リラクゼーション感の中間確認 & チーム内で心地よく聞こえること & チーム内試聴確認 \\
+  MOP6 & BPM変更後の反映遅延 & 1小節以内 & ログで反映タイミング確認 \\
+  MOP7 & BPM急変後の収束小節数 & 変化量$\div 10$小節以内 & シリアルログ計測 \\
+  \bottomrule
+\end{tabular}
+\caption{技術性能指標TPM}
+\label{tab:tpm}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{プロジェクト中に監視するプロジェクト管理指標}
+プロジェクトの進捗を管理するため，以下の指標を週次MTGで確認する．
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{L{5cm}L{9cm}}
+  \toprule
+  \textbf{指標} & \textbf{閾値・基準} \\
+  \midrule
+  WBS進捗率 & 見積もり工数の80\%以上 \\
+  マイルストーン到達状況 & 第7週・第10週に期限通り達成 \\
+  部品調達リードタイム & 第4〜5週内に納品完了 \\
+  \bottomrule
+\end{tabular}
+\caption{プロジェクト管理指標}
+\label{tab:pm_tpm}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\section{資源・調達管理}
+
+\paragraph{人的資源}
+本プロジェクトはチーム4の6名で構成される．
+\begin{itemize}[leftmargin=1.2em]
+  \item \textbf{3年生（酒井・武本・細澤）}：PM・全体管理・設計書作成・統合テストを主導する．
+  \item \textbf{2年生（佐藤・成毛・山口）}：各担当タスク（音色作成・通信実装・スレーブ実装）を担当する．
+\end{itemize}
+
+\paragraph{物的資源}
+中核はArduino Uno 5台（指揮者1台＋楽器スレーブ3台＋リズムスレーブ1台）．
+周辺はロードセル，HX711モジュール，サーボモーター，抵抗，ブレッドボード，ジャンパー線，テンポ入力ポテンショメータ，USB配線，筐体素材，USB電源．
+詳細な型番・個数・費用は表\ref{tab:parts}に示す．
+
+\paragraph{調達計画}
+部品調達は第4〜5週（WBS 1.1）に実施し，第5週末までに全部品の納品完了を目標とする．
+型番・費用はWBS1.1の実施に伴い順次確定する．
+納期遅延が発生した場合は代替部品の調達またはスケジュール修正を行う．
+
+\paragraph{開発環境}
+\begin{itemize}[leftmargin=1.2em]
+  \item Arduino IDE．
+  \item Processing 開発環境．
+  \item Audacity または Python（numpy／scipy.fft）：FFT解析用．
+  \item PC（メンバ私物）．
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\section{リスク管理}
+装置構築上の主要リスクと対応方針を示す．
+
+\begin{table}[htbp]
+  \centering
+  \begin{tabular}{L{4cm}C{1.5cm}L{4cm}L{4cm}}
+    \toprule
+    \textbf{リスク} & \textbf{優先度} & \textbf{影響} & \textbf{対策} \\
+    \midrule
+    I2C同期精度の達成困難 & 高 & 輪唱システム作成の遅延 & PLL補正係数の調整余地を早期に評価する．50ms強制スナップを安全弁とし，第8〜9週の2楽器結合テストで暫定値を確定する． \\[0.5em]
+    実装に想定より時間がかかる & 高 & スケジュール遅延 & TRLログで逐一チェックし工数超過が見られた場合は工数を増やす \\[0.5em]
+    ハードウェアが正常動作しない & 高 & ソフトウェア実装開始の遅延 & Arduino・センサ単体動作確認，接続チェック，コードレビューで原因究明．各部品の故障に備え予備機，センサも最低1つ確保． \\[0.5em]
+    メンバー間の進捗格差 & 中 & 統合フェーズへの影響 & PMが定期ヒアリングを行い，余裕のあるメンバーがタスクをサポート \\[0.5em]
+    モーターの動作不安定 & 中 & エンターテインメント機能への影響 & Servo.hのPWM出力がWire.hのタイミングに干渉する場合は外部電源でサーボを駆動すること \\[0.5em]
+    \bottomrule
+  \end{tabular}
+  \caption{リスクと対策一覧}
+  \label{tab:risk}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{システムの基本設計}
+%%%%%%%%%%%%%%%%%%%%%%%%
+\section{機能一覧}
+\begin{longtable}{C{1.2cm}C{1.2cm}L{4cm}L{7.5cm}}
+  \caption{機能分解構造（FBS）一覧 - 詳細版}\label{tab:fbs}\\
+  \toprule
+  \textbf{大項目} & \textbf{小項目} & \textbf{機能名} & \textbf{説明} \\
+  \midrule
+  \endfirsthead
+  \toprule
+  \textbf{大項目} & \textbf{小項目} & \textbf{機能名} & \textbf{説明} \\
+  \midrule
+  \endhead
+  \midrule
+  \endfoot
+  \bottomrule
+  \endlastfoot
+  \multirow{6}{*}{F1} & F1.1 & SYNCマーカー配信機能 & マスタが各小節頭にSYNCコマンドを全スレーブへ順次ユニキャストする \\
+  & F1.2 & SYNC受信・デコード機能 & スレーブがI2C割り込みでSYNCを受信し，バッファへ格納してメインループへフラグを渡す \\
+  & F1.3 & PLL位相補正機能 & 受信SYNCと予測時刻の誤差を補正係数0.3で次小節長に反映し，50ms超は強制スナップする \\
+  & F1.4 & 同期精度計測・検証機能 & 楽器間最大誤差をシリアルログで記録し，MOP1の合格を判定する \\
+  & F1.5 & START/STOP制御機能 & センサトリガでSTART/STOPを全スレーブへ順次ユニキャストし，演奏開始・停止を制御する \\
+  & F1.6 & 楽器構成管理機能 & part\_id・I2Cアドレス・entry\_offsetを定義し，5台構成を管理する \\
+  \midrule
+  \multirow{3}{*}{F2} & F2.1 & センサ入力・BPM変換機能 & ポテンショメータをanalogRead()で取得し，EMAローパスフィルタとデッドバンドでBPM×10整数値に変換する \\
+  & F2.2 & BPM変化制限機能 & 1小節あたりの変化量を最大10BPMに制限し，急激なテンポ変化を防止する \\
+  & F2.3 & CONFIG配布機能 & 起動時にentry\_offset・part\_idをスレーブ個別へI2C通信でユニキャストする \\
+  \midrule
+  \multirow{6}{*}{F3} & F3.1 & 楽譜データ管理機能 & PROGMEM格納用バイナリシーケンスを定義し，12小節の旋律データをentry\_offset対応で管理する \\
+  & F3.2 & 音符スケジューリング機能 & pgm\_read\_byte()でPROGMEMから音符データを読み出し，補正タイマーに基づいたNote ON/OFFイベントを送出する \\
+  & F3.3 & 輪唱位置管理機能 & global\_barとentry\_offsetからmy\_local\_barを計算し，各スレーブの演奏開始タイミングを制御する \\
+  & F3.4 & リズムパターン演奏機能 & BPM連動の4/4拍子パーカッションパターンをSerial送出する（輪唱制御は不要） \\
+  & F3.5 & Note ON/OFF送信機能 & 2バイト固定長バイナリフォーマットでProcessingへSerial送信する \\
+  & F3.6 & 可変テンポ追従機能 & BPM変更後変化量÷10小節以内に全スレーブが新テンポへ収束する \\
+  \midrule
+  \multirow{6}{*}{F4} & F4.1 & フルート音色合成機能 & 偶数倍音中心の加算合成でフルートの音色を再現する \\
+  & F4.2 & クラリネット音色合成機能 & 奇数倍音優勢・閉管特性の加算合成でクラリネットの音色を再現する \\
+  & F4.3 & オルガン音色合成機能 & 持続音・倍音豊富な加算合成でオルガンの音色を再現する \\
+  & F4.4 & ドラム音色合成機能 & 打撃音・リズムパターン音色を合成する \\
+  & F4.5 & ADSRエンベロープ制御機能 & Attack/Decay/Sustain/Releaseのエンベロープを各楽器パラメータで制御する \\
+  & F4.6 & Serial受信・振り分け機能 & 115200bpsのバイナリデータを受信・パースし，NOTE\_ON/OFFを各パートへ振り分ける \\
+  \midrule
+  \multirow{4}{*}{F5} & F5.1 & 回転演出機能 & PLAYING状態中，連続回転サーボでアームを一定速度で回転させる \\
+  & F5.2 & 荷重検知機能 & ロードセル＋HX711でアーム台座への荷重を計測し，しきい値超過をトリガとして検知する \\
+  & F5.3 & 状態管理機能 & IDLE→PLAYING→FINISHED→IDLEの状態遷移を管理し，START信号送信を制御する \\
+  & F5.4 & 自動リセット機能 & FINISHED状態から30秒経過後にIDLEへ自動復帰する \\
+  \midrule
+  \multirow{2}{*}{F6} & F6.1 & I2C通信機能 & SDA/SCLによる有線I2Cバスで5台のArduinoを接続し，SYNC/START/STOP/CONFIGコマンドを送受信する \\
+  & F6.2 & Serial通信・音声出力機能 & 115200bpsのUSB Serialで各ArduinoをProcessing PCに接続し，Note ON/OFFイベントを送信する \\
+\end{longtable}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
+\section{システム構成図}
+ハードウェア構成は以下の通りである．
+システムの構成図を図\ref{fig:system}で示す．
+
+\begin{itemize}[leftmargin=1.2em]
+  \item \textbf{指揮者 Arduino}（マスタ）：I\textsuperscript{2}Cバス上の唯一のマスタ．
+        BPM変更のためポテンショメータ，開始トリガとしてロードセル，エンターテインメント機能として連続回転サーボモーターを接続．
+  \item \textbf{楽器スレーブ Arduino $\times 3$}：フルート／クラリネット／オルガン担当．
+        各台がUSB経由でProcessingへ\texttt{NOTE\_ON/OFF}を送出．
+        I\textsuperscript{2}Cで指揮者からSYNC/CONFIGを受信．
+  \item \textbf{リズムスレーブ Arduino}：ドラム担当．
+        SYNCのみ受信し，BPM連動でドラムパターンを送出．
+  \item \textbf{Processing PC}：4台のArduinoからSerialを多重受信し，
+        4音色の加算合成を行いPCから出力．
+\end{itemize}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{fig/system.png}
+  \caption{システム全体の構成図}
+  \label{fig:system}
+\end{figure}
+
+\subsection{通信方式の選定理由}
+本システムではマスタ→スレーブ間にI2C通信，スレーブ→Processing間にUSB Serial通信を採用した．
+I2C通信を採用した理由は2点である．
+1つ目はバス型接続により1対多の通信が可能であるためである．
+I2C通信の規格でブロードキャストはできないが，4台のスレーブのアドレスを参照してコマンドを順次ユニキャストできる．
+Standard Mode（100\,kHz）における4スレーブへの順次送信時間は約1.16\,msであり，同期誤差の目標値（$\leq 30$\,ms）の約4\%以下に収まる．
+そのため実用上の同期精度への影響は無視できると考えた．
+2つ目はマスタが生成したSCLクロックをスレーブが直接参照してデータを読み取る同期通信であるためである．
+非同期通信であるUARTではボーレートのズレが蓄積してデータが化けるリスクがある．
+一方でI2C通信であれば送受信間のクロックズレによるビット誤読取りが原理的に発生しないため，データ破損のリスクを未然に防ぐことができる．
+以上の2点から本システムではマスタ→スレーブ間の通信方式としてI2Cを採用した．
+\par
+次にUSB Serial通信の採用理由を2点説明する．
+1つ目はProcessingがSerial通信を標準サポートしており実装が容易なためである．
+2つ目はPCにI2Cポートが搭載されておらずUSB-I2C変換アダプタが必要になる点で，I2CをPC間通信に使用することが困難なためである．
+また，本システムでは複数スレーブを1台のPCにまとめず，各スレーブに専用のPCを接続する構成とした．
+これはUARTが1対1通信を前提とした規格であり混線によるデータ消失・破損リスクがあるためである．
+
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%
+\section{操作インターフェース設計}
+本システムは受動的環境介入として設計され，常時利用者の能動的操作は要求しない．
+ただし利用者が自身にとって快適なテンポに調節できるようポテンショメータによるBPM変調インターフェースを設計する．
+また，受動的環境介入として座ることや何かを置く動作を開始トリガとするためロードセルを用いたインターフェースを設計する．
+各インターフェースの動作を以下に示す．
+また，それぞれの使用例を示した図を\ref{fig:start_ui}，\ref{fig:end_ui}，\ref{fig:bpm_ui}に示す．
+
+\paragraph{ロードセル}
+\begin{itemize}
+    \item \textbf{操作}：荷重をかける
+    \item \textbf{挙動}：閾値を超えた時点でサーボモーターが回転し演奏開始トリガとなる
+    \item \textbf{状態}：IDLE→PLAYINGに変化，演奏が停止するとPLAYING→FINISHEDに変化
+\end{itemize}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{fig/start_ui.png}
+  \caption{ロードセルによる演奏開始の図}
+  \label{fig:start_ui}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{fig/end_ui.png}
+  \caption{演奏停止の図}
+  \label{fig:end_ui}
+\end{figure}
+
+\clearpage
+\paragraph{ポテンショメーター}
+\begin{itemize}
+    \item \textbf{操作}：つまみを回す
+    \item \textbf{挙動}：BPMがリアルタイムで変化し全スレーブのテンポが追従する
+    \item \textbf{条件}：PLAYING状態でのみテンポが変化する
+\end{itemize}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{fig/bpm_ui.png}
+  \caption{ポテンショメーターによるリズム変更の図}
+  \label{fig:bpm_ui}
+\end{figure}
+
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%
+\section{状態遷移図}
+本システムの基本状態は\textbf{IDLE}（電源ON，CONFIG済，演奏トリガ待ち），
+\textbf{PLAYING}（輪唱演奏進行中．小節ごとにPLL補正．誤差50ms超で強制スナップ），
+\textbf{FINISHED}（演奏完了．RESET\_DELAY経過後にIDLEへ自動復帰）の3状態である．
+状態遷移を図\ref{fig:state}に示す．
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    >={Stealth[length=2.5mm]},
+    node distance=3.5cm,
+    state/.style={ellipse, draw, thick, minimum width=2.6cm, minimum height=1.2cm, align=center, inner sep=2pt}
+]
+\node[state] (idle) {IDLE\\(待機状態)};
+\node[state, right=of idle] (play) {PLAYING\\(輪唱中)};
+\node[state, right=of play] (fin) {FINISHED\\(演奏完了)};
+
+\draw[->, thick, font=\footnotesize]
+    (idle) edge[bend left=20] node[above, midway, align=center]{ロードセル検知\\かつROTATE\_DURATION経過} (play);
+\draw[->, thick, font=\footnotesize]
+    (play) edge[bend left=20] node[above, midway, align=center]{global\_bar\\$\geq$ loop\_length} (fin);
+\draw[->, thick, font=\footnotesize]
+    (fin.north) edge[bend right=60] node[above, midway, align=center]{RESET\_DELAY\\(30秒)経過} (idle.north);
+\draw[->, thick, font=\footnotesize]
+    (play) edge[loop below] node[below, align=center]{毎小節\\PLL補正} (play);
+\draw[->, thick, font=\footnotesize]
+    (play) edge[loop above, looseness=8] node[above, align=center, font=\scriptsize]{誤差 $>$ 50\,ms\\強制スナップ} (play);
+\draw[->, thick, font=\footnotesize, shorten <=4pt]
+    ([yshift=2pt]idle.west) ++(-1.2,0) -- (idle.west) node[midway, above]{起動};
+\end{tikzpicture}
+\caption{システム状態遷移図}
+\label{fig:state}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{システムの詳細設計}
+%%%%%%%%%%%%%%%%%%%%%%%%
+\section{部品一覧}
+
+\begin{longtable}{C{1.2cm}C{1.2cm}L{4.5cm}L{6.5cm}}
+  \caption{製品分解構造PBS）一覧 - 詳細版}\label{tab:pbs}\\
+  \toprule
+  \textbf{大項目} & \textbf{小項目} & \textbf{製品名} & \textbf{仕様・備考} \\
+  \midrule
+  \endfirsthead
+  \toprule
+  \textbf{大項目} & \textbf{小項目} & \textbf{製品名} & \textbf{仕様・備考} \\
+  \midrule
+  \endhead
+  \midrule
+  \endfoot
+  \bottomrule
+  \endlastfoot
+  \multirow{3}{*}{P1} & P1.1 & Arduino Uno（マスタ）& BPMセンサ入力・SYNC配信・START/STOP制御 \\
+  & P1.2 & ポテンショメータ（BPMセンサ）& 10k$\Omega$，analogRead()でBPM変換 \\
+  & P1.3 & I2Cプルアップ抵抗 & 配線長・電圧に応じた定数（回路図参照）\\
+  \midrule
+  \multirow{2}{*}{P2} & P2.1 & Arduino Uno（楽器スレーブ $\times$3）& フルート(0x10)・クラリネット(0x11)・オルガン(0x12) \\
+  & P2.2 & USBケーブル（$\times$3）& Serial 115200bps，Arduino→Processing PC接続 \\
+  \midrule
+  \multirow{2}{*}{P3} & P3.1 & Arduino Uno（リズムスレーブ）& Drum(0x13) \\
+  & P3.2 & USBケーブル & Serial 115200bps，Arduino→Processing PC接続 \\
+  \midrule
+  \multirow{4}{*}{P4} & P4.1 & 連続回転サーボ& PWMパルス幅で回転速度制御 \\
+  & P4.2 & ロードセル＋HX711モジュール & 荷重検知用（DATピン：D3，SCKピン：D4，しきい値：実測調整）\\
+  & P4.3 & アーム・星形飾り & グルーガンでシャフト固定 \\
+  & P4.4 & エンターテインメント台座 & サーボ・センサ固定用マウント \\
+  \midrule
+  \multirow{2}{*}{P5} & P5.1 & Processing 実行PC& 4種類の楽器に対応したprocessingインスタンスを起動兼音声出力先 \\
+  \midrule
+  \multirow{2}{*}{P6} & P6.1 & I2Cバス配線（SDA/SCL）& 5台Arduino間，プルアップ実装済み \\
+  & P6.2 & Arduino用電源・接続ケーブル & USB電源供給ケーブル \\
+  \midrule
+  \multirow{2}{*}{P7} & P7.1 & Arduinoマウント筐体 & 5台Arduino収容・固定，発表展示用 \\
+  & P7.2 & ソフトウェア一式 & Arduinoスケッチ・Processingスケッチ・楽譜データ \\
+\end{longtable}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\section{ハードウェア設計}
+通信方式・物理構成・同期アーキテクチャの詳細仕様は同期方針計画書~\S2〜\S5 に従う．
+
+\subsection{機材表}
+本システムの構築および動作検証においては，表~\ref{tab:parts}~に示す機材を活用する．
+中核は5台のArduino（指揮者1台＋楽器スレーブ3台＋リズムスレーブ1台）であり，これらをジャンパーワイヤーで接続する．
+各楽器スレーブはUSB Serial経由でProcessingへ音符イベントを送出する．
+電源はUSB給電を想定し，筐体は段階的に整備する．
+型番および費用の欄は調達計画の確定に伴い順次更新する．
+
+{\footnotesize
+\begin{longtable}{@{}p{6cm} p{4.4cm} p{1.4cm} p{1.6cm} p{1.6cm}@{}}
+\caption{機材表（Arduino オーケストラ）}\label{tab:parts}\\
+\toprule
+\textbf{機材名} & \textbf{型番} & \textbf{個数} & \textbf{調達方法} & \textbf{費用(円)} \\
+\midrule \endhead
+マイコンボード & Arduino Uno R4 WiFi & 5 & 購入／既存 & TBD \\
+連続回転サーボモータ & TBD & 1 & 購入 & TBD \\
+ロードセル & TBD（定格500g） & 1 & 購入 & TBD \\
+HX711モジュール & HX711 & 1 & 購入 & TBD \\
+炭素皮膜抵抗（プルアップ） & 2.2k$\Omega$ & 2本 & 購入 & TBD \\
+ブレッドボード & --- & 5前後 & 購入／既存 & TBD \\
+ジャンパーワイヤ & --- & 一式 & 購入 & TBD \\
+Serial／USBケーブル & USB Type-B & 5 & 購入／既存 & TBD \\
+テンポ入力センサ & ポテンショメータ（10k$\Omega$） & 1 & 購入 & TBD \\
+アーム・星形飾り & --- & 一式 & 自作 & TBD \\
+エンターテインメント台座 & --- & 1 & 自作 & TBD \\
+PC（Processing 実行環境） & メンバ私物 & 1 & 既存 & 0 \\
+筐体素材 & TBD & 一式 & 購入 & TBD \\
+電源 & USB（PC／ACアダプタ） & --- & 既存 & 0 \\
+\midrule
+\textbf{合計} & & & & \textbf{TBD} \\
+\bottomrule
+\end{longtable}}
+
+\subsection{I\textsuperscript{2}C結線}
+指揮者Arduinoをマスタとし，SDA／SCLバスにスレーブ4台（楽器3台＋リズム1台）を接続する．
+スレーブアドレスは楽器 フルート=0x10／クラリネット=0x11／オルガン=0x12／ドラム=0x13とする．
+また，I2C通信はオープンドレイン出力であるため電圧を5Vに引き上げるためにプルアップ抵抗を用いる．
+プルアップ抵抗（2.2\,k$\Omega$）は2本配置する．
+バス長は短く保ち，通信速度は標準モード100\,kHzから開始する（必要時にFastmode 400\,kHzへ切替）．
+配線手順を以下に示す．
+
+\begin{enumerate}
+  \item 全ArduinoのSDAピン（A4）を1本の配線で接続する（バス接続）
+  \item 全ArduinoのSCLピン（A5）を1本の配線で接続する（バス接続）
+  \item SDA-VCC間に$2.2\,\mathrm{k\Omega}$を1本取り付ける（プルアップ）
+  \item SCL-VCC間に$2.2\,\mathrm{k\Omega}$を1本取り付ける（プルアップ）
+  \item VCCはマスタ用Arduinoの5Vピンから供給する
+  \item 全ArduinoのGNDを共通GNDラインに接続する
+\end{enumerate}
+
+\subsection{I2Cプルアップ抵抗値の算出}
+I2C通信はオープンドレイン出力であるため，電圧を5Vに引き上げるためにプルアップ抵抗を用いる．
+プルアップ抵抗値$R_p$は以下の式で算出する．
+
+\[
+  R_{p,\min} = \frac{V_{CC} - V_{OL,\max}}{I_{OL}} = \frac{5.0 - 0.4}{3 \times 10^{-3}} \approx 1533\,\Omega
+\]
+\[
+  R_{p,\max} = \frac{t_r}{0.8473 \cdot C_{b}} = \frac{1000 \times 10^{-9}}{0.8473 \times 400 \times 10^{-12}} \approx 2948\,\Omega
+\]
+
+ここで，$V_{CC} = 5.0\,\mathrm{V}$，$V_{OL,\max} = 0.4\,\mathrm{V}$，
+$I_{OL} = 3\,\mathrm{mA}$（Arduino ATmega328P仕様），
+$t_r = 1000\,\mathrm{ns}$（Standard Mode），$C_b = 400\,\mathrm{pF}$．
+
+\medskip
+\noindent\textbf{【採用値】プルアップ抵抗：$R_p = 2.2\,\mathrm{k\Omega}$}\\
+SDA・SCLの両線にそれぞれ1本，計2本実装する．プルアップ電源はマスタArduinoの5V端子から供給する．
+\medskip
+
+\subsection{回路図}
+本システムのマスタとスレーブの接続の回路図を図\ref{cercuit1}で示す．
+またマスタとポテンショメータの接続に関する回路図を図\ref{cercuit2}で示す．
+ロードセルと連続回転サーボモーターの接続の回路図を図\ref{cercuit3}で示す．
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{fig/cercuit1.png}
+  \caption{マスタとスレーブを接続した回路図}
+  \label{cercuit1}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{fig/cercuit2.png}
+  \caption{マスタとポテンショメータを接続した回路図}
+  \label{cercuit2}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{fig/cercuit3.png}
+  \caption{マスタとロードセル・連続回転サーボモーターを接続した回路図}
+  \label{cercuit3}
+\end{figure}
+
+\subsection{エンターテインメント装置設計}
+本システムのエンターテインメント機能を実現するための装置構成と設計方針を以下に示す．
+詳細な寸法・素材はWBS1.3（ベビーメリー風装置の製作）にて決定する．
+
+\paragraph{装置構成}
+\begin{itemize}
+  \item \textbf{台座}：ロードセルとサーボモーターを固定するマウント．利用者が荷重をかけた際に安定して検知できるよう，十分な剛性を持つ素材で製作する．
+  \item \textbf{連続回転サーボモーター}：台座に固定し，アームを回転させる駆動源．BPMに応じてPWMパルス幅を変化させることで回転速度を制御する．
+  \item \textbf{アーム・星形飾り}：サーボモーターのシャフトにグルーガンで固定する．回転中に外れないよう十分に固定する．
+  \item \textbf{ロードセル}：台座底面に配置し，利用者が台座に荷重をかけた際にHX711モジュール経由でArduinoが検知する．
+\end{itemize}
+
+\paragraph{設計方針}
+\begin{itemize}
+  \item 荷重検知のしきい値（\texttt{LOAD\_THRESHOLD}）は個体差があるため，実測調整を前提とした設計とする．
+  \item サーボモーターの停止値（\texttt{SERVO\_STOP}）も個体差があるため，キャリブレーションを実施してから本番コードに反映する．
+  \item 演奏中はロードセル検知を無視し，誤トリガを防止する．
+  \item サーボの回転速度はBPMに連動して\texttt{map()}関数で制御し，テンポに合わせた視覚的演出を実現する．
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\section{ソフトウェア設計}
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{パート構成と輪唱の実現}
+主旋律3パート（フルート・クラリネット・オルガン）＋リズム1パート（ドラム）の計4パート．
+主旋律3パートは\texttt{entry\_offset}（先頭からの参加遅延小節数）に応じて時間差で演奏を開始することで輪唱を成立させる．
+本システムでは2小節ずつずらす設計を基本とし，フルート=0，クラリネット=2，オルガン=4を割り当てる．
+ドラムは\texttt{entry\_offset = 0}かつ輪唱に参加せず，全曲を通して拍を刻む．
+
+\subsection{楽器別音色設計}
+各楽器担当がW2.1（楽器別倍音比率の調査・データ化）で\texttt{instrument\_designs}配下のHTMLワークリストを完成させ，
+そこで得たFFT倍音比率をProcessing側の加算合成パラメータとして反映する．
+本節は4楽器の設計方針の要点のみ記す．
+詳細は各\texttt{*\_design.html}を参照．
+倍音比率の調査にあたっては実楽器の録音データを基準値として使用する．
+フルート・クラリネット・ドラムについてはUniversity of Iowa Musical Instrument Samplesを参照する\cite{ref:iowa}．
+オルガンについてはLeeds Town Hall Organを参照する\cite{ref:leeds}．
+
+\paragraph{クラリネット（佐藤 担当）}
+円筒閉管楽器であり，境界条件から定在波モードは奇数倍音（1, 3, 5, 7, \dots）に支配される．
+合成方針は\textbf{矩形波ベース＋ローパスフィルタ}を基本線とし，
+偶数倍音は理想的にはゼロだが実楽器のリアリティを出すため低レベルで薄く混ぜる．
+ADSRは息の入れ続けに対応する持続型（Attack 短め・Sustain 高め・Release 中程度）で設計する．
+具体的な倍音レベル（dB）・カットオフ周波数・ADSR 数値はワークリストR-5（FFT実測）とc1〜c5（設計判断）で確定．
+
+\paragraph{フルート（山口 担当）}
+両端開管楽器であり，全倍音が定在波モードを持つが，息の励起特性により基音支配＋高次倍音弱めの構造となる．
+合成方針は\textbf{サイン波中心＋息ノイズ加算＋ADSR}を基本線とし，息ノイズの帯域とレベルでフルートらしい立ち上がり感を表現する．
+具体パラメータはワークリストR-5・f1〜f5で確定．
+
+\paragraph{オルガン（成毛 担当）}
+パイプ／リード方式に依らず，複数の正弦波を加算する\textbf{ドローバー方式の加算合成}を採用．
+複数倍音を独立に重み付けし，和音対応のためボイス管理（同時発音数の上限とエージング）を行う．
+ADSR は Sustain 高めで持続音楽器らしさを表現．
+具体パラメータはワークリストR-5・o1〜o5で確定．
+
+\paragraph{ドラム（成毛 担当）}
+ピッチ楽器ではないため倍音構造の設計対象外．
+\textbf{ノイズバースト＋短エンベロープ}で打撃音を合成し，BPM連動でパターンを刻む．
+打撃スペクトルのノイズ帯域と減衰カーブをM3の比較対象とする．
+輪唱制御は不要で，リズムスレーブArduinoがSYNC受信のみで自律的にパターンを送出する．
+
+\subsection{メッセージプロトコル}
+I\textsuperscript{2}CメッセージはWireバッファ32バイト以内に収まる4種類のCMDで構成する．
+各コマンドを表~\ref{tab:i2cmsg}で示す．
+
+\begin{longtable}{@{}p{1.2cm} p{1.6cm} p{4.6cm} p{7.2cm}@{}}
+\caption{I\textsuperscript{2}C メッセージ仕様}\label{tab:i2cmsg}\\
+\toprule
+\textbf{CMD} & \textbf{名称} & \textbf{用途} & \textbf{ペイロード} \\
+\midrule \endhead
+0x01 & SYNC   & 小節頭マーカー配信（毎小節） & \texttt{global\_bar}（4bit）＋ \texttt{BPM$\times$10}（11bit）＋ 予備（1bit） \\
+0x02 & START  & 演奏開始（順次ユニキャスト） & なし \\
+0x03 & STOP   & 演奏停止（順次ユニキャスト） & なし \\
+0x04 & CONFIG & 起動時のパート設定（個別1回） &
+  \texttt{entry\_offset}（2bit）＋ \texttt{part\_id}（2bit）＋予備（4bit） \\
+\bottomrule
+\end{longtable}
+
+\paragraph{SYNC 例}
+120BPMで第8小節頭を通知する場合のバイト列は\texttt{[0x01, 0x00, 0x08, 0x04, 0xB0]}
+（\texttt{global\_bar = 8}，\texttt{BPM*10 = 1200 = 120.0 BPM}）．
+BPMを$\times 10$ で整数化する根拠は，浮動小数点をI\textsuperscript{2}Cバイト列で扱う実装コストを避けつつ，
+120.5BPMのような小数第1位精度を確保するためである．
+
+\subsection{音楽データ・フォーマット}
+ArduinoからProcessingへ送信するメッセージを表\ref{tab:serial}に示す．
+1音符あたり2バイトに圧縮することで，Serial通信帯域を最小化する．
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{L{2cm}L{2cm}L{2.5cm}L{8.5cm}}
+  \toprule
+  \textbf{バイト} & \textbf{ビット} & \textbf{フィールド} & \textbf{内容} \\
+  \midrule
+  Byte 0 & [7:0] & SOF & スタートオブフレーム（0xFF固定） \\
+  Byte 1 & [7:6] & CMD & 0=NOTE\_ON, 1=NOTE\_OFF, 2=BPM\_UPDATE, 3=予備 \\
+  Byte 1 & [5:4] & PART\_ID & 0=Flute, 1=Clarinet, 2=Organ, 3=Perc \\
+  Byte 1 & [3:1] & PITCH & 音程（0=C4〜6=B4の7音階） \\
+  Byte 1 & [0] & 予備 & 将来の拡張用 \\
+  \bottomrule
+\end{tabular}
+\caption{Serialメッセージフォーマット（2バイト固定）}
+\label{tab:serial}
+\end{table}
+
+\subsubsection{楽譜バイナリフォーマット仕様}
+
+PROGMEM格納の効率を優先し，\textbf{1バイト/音符}とする．
+楽譜のバイナリフォーマットを表\ref{tab:score}に示す．
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{L{2cm}L{2.5cm}L{10.5cm}}
+  \toprule
+  \textbf{ビット} & \textbf{フィールド} & \textbf{内容} \\
+  \midrule
+  {[7]} & REST & 休符フラグ（0=発音, 1=休符） \\
+  {[6:4]} & NOTE & 音程（0=C4〜6=B4の7音階） \\
+  {[3:1]} & DUR & 音長コード（0=全音符,1=2分,2=4分,3=8分,4=付点4分,5=付点8分,6=16分,7=予備） \\
+  {[0]} & 予備 & 将来の拡張用 \\
+  \bottomrule
+\end{tabular}
+\caption{楽譜バイナリフォーマット（1バイト/音符）}
+\label{tab:score}
+\end{table}
+
+\subsection{ファイル構成}
+\begin{itemize}[leftmargin=1.2em]
+  \item \texttt{conductor/}：指揮者Arduinoスケッチ（SYNC生成・BPM入力・START/STOP）．
+  \item \texttt{slave\_flute/}, \texttt{slave\_clarinet/}, \texttt{slave\_organ/}：楽器スレーブスケッチ．
+  \item \texttt{slave\_percussion/}：リズムスレーブスケッチ．
+  \item \texttt{common\_lib/}：PROGMEM読み出し・I\textsuperscript{2}Cフレーム処理の共通ライブラリ（WBS2.3）．
+  \item \texttt{processing/}：Processing音声合成コード．
+\end{itemize}
+
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{オブジェクト設計(クラス図)}
+本システムのクラス図をマスタ，スレーブ，ソフトウェアにわけそれぞれ図\ref{fig:class_1}，\ref{fig:class_2}，\ref{fig:class_3}に示す．
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{fig/class_1.png}
+  \caption{マスタのクラス図}
+  \label{fig:class_1}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.4\linewidth]{fig/class_2.png}
+  \caption{スレーブのクラス図}
+  \label{fig:class_2}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{fig/class_3.png}
+  \caption{Processingソフトウェアのクラス図}
+  \label{fig:class_3}
+\end{figure}
+
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{関数設計}
+本システムで使用する関数を以下でそれぞれ定義する．
+
+\paragraph{Arduino（マスタ）}
+\begin{itemize}[leftmargin=1.2em]
+  \item \texttt{readBpmSensor()}：\texttt{analogRead}$\to$EMA$\to$デッドバンド$\to \times 10$整数．
+  \item \texttt{sendSync(uint8\_t global\_bar, uint16\_t bpm10)}：I\textsuperscript{2}CでSYNCメッセージ送信．
+  \item \texttt{sendConfig(uint8\_t slave\_addr, uint8\_t entry\_offset, uint8\_t part\_id)}：起動時のCONFIG送信．
+  \item \texttt{sendStart()}：I\textsuperscript{2}C経由で全スレーブへCMD\_START送信．
+  \item \texttt{sendStop()}：I\textsuperscript{2}C経由で全スレーブへCMD\_STOP送信．
+\end{itemize}
+
+\paragraph{Arduino（スレーブ）}
+\begin{itemize}[leftmargin=1.2em]
+  \item \texttt{entry\_offset}（\texttt{uint8\_t}）：CONFIGで設定される演奏開始オフセット小節．
+  \item \texttt{my\_local\_bar}（\texttt{int32\_t}）：ローカル演奏小節番号（-1=待機中）．
+  \item \texttt{beat\_period\_us}（\texttt{uint32\_t}）：PLL補正後の小節長（マイクロ秒）．
+  \item \texttt{next\_beat\_us}（\texttt{uint32\_t}）：次回小節頭タイムスタンプ．
+  \item \texttt{target\_period\_us}（\texttt{uint32\_t}）：受信BPMから算出した理論小節長．
+  \item \texttt{missed\_sync\_count}（\texttt{uint8\_t}）：連続SYNCミスカウント．
+  \item \texttt{onReceiveISR()}：\texttt{onReceive}割り込みでフレーム受信，フラグ引き渡しのみ．
+  \item \texttt{updatePLL(int16\_t measured\_dt)}：誤差$\times 0.3$を次小節長へ反映，50ms超で強制スナップ．
+  \item \texttt{scheduleNotes(uint8\_t my\_local\_bar)}：PROGMEMから音符読み出しSerial送出．
+\end{itemize}
+
+\paragraph{Processing}
+\begin{itemize}[leftmargin=1.2em]
+  \item \texttt{Voice::synthesize(uint8\_t pitch, uint8\_t velocity)}：倍音加算合成＋ADSR．
+  \item \texttt{Voice::release()}：クリック回避（再トリガ前のRelease確実化）．
+  \item \texttt{SerialReceiver::dispatch(uint8\_t[2] msg)}：受信フレームを担当パートのVoiceへ振り分ける．
+  \item \texttt{SerialEvent()}：Serialイベント駆動で2バイトフレームを受信・パースし，\texttt{dispatch()}へ渡す．
+  \item \texttt{SerialFrame::decode(uint8\_t[2] bytes)}：受信バイト列をCMD・PART\_ID・PITCHに分解する．
+\end{itemize}
+
+\paragraph{エンターテインメント機能}
+\begin{itemize}[leftmargin=1.2em]
+  \item \texttt{readLoadCell()}：HX711から荷重値を読み取り，LOAD\_THRESHOLDと比較してしきい値判定する．
+  \item \texttt{handleIdle()}：ロードセル監視・しきい値判定・IDLE→PLAYING遷移．
+  \item \texttt{handlePlaying()}：演奏終了監視・PLAYING→FINISHED遷移・サーボ停止．
+  \item \texttt{handleFinished()}：RESET\_DELAY経過後にIDLE自動復帰．
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\section{処理フローの設計}
+\subsection{マスタ処理フロー}
+マスタは\texttt{loop()}内で基本フロー（SYNC配信）と状態管理フロー（IDLE/PLAYING/FINISHED）を並行して実行する．
+両フローを図\ref{fig:master_1}と図\ref{fig:master_2}に示す．
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.45\linewidth]{fig/master_1.png}
+  \caption{基本フロー（SYNC配信）を示す図}
+  \label{fig:master_1}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{fig/master_2.png}
+  \caption{状態管理フローを示す図}
+  \label{fig:master_2}
+\end{figure}
+
+\clearpage
+\subsection{スレーブ処理フロー}
+スレーブArduinoの処理フローを図\ref{fig:slave}に示す．
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.9\linewidth]{fig/slave.png}
+  \caption{スレーブ処理フローを示す図}
+  \label{fig:slave}
+\end{figure}
+
+\clearpage
+\subsection{輪唱の時間構造}
+本システムが扱う「きらきらぼし」全12小節（4/4 拍子）を，主旋律3パートが2小節ずつずれて参加する設計を採る．
+すなわちフルートは0小節目，クラリネットは2小節目，オルガンは4小節目から発音を開始する．
+ドラムは輪唱に参加せず，全曲を通して拍を刻む．
+各楽器の演奏位置は以下の2変数で管理する．
+
+\begin{itemize}[leftmargin=1.2em]
+  \item \texttt{global\_bar}：曲全体の先頭からの通算小節番号（指揮者の視点，物理時刻に対応）．
+  \item \texttt{my\_local\_bar}：自パートが演奏を開始してから何小節目か（各楽器の視点）．
+\end{itemize}
+
+両者の変換式は\texttt{my\_local\_bar = global\_bar - entry\_offset}で表される．
+例としてクラリネット（\texttt{entry\_offset = 2}）は，
+\texttt{global\_bar = 5}のとき\texttt{my\_local\_bar = 3}（自パートの3小節目を演奏中），
+\texttt{global\_bar = 1}のとき\texttt{my\_local\_bar = -1}（まだ参加前）となる．
+この設計により，全パートが同一BPMで進みながら，楽器ごとに異なる演奏位置を保持できる．
+仮にフルートとオルガンのズレ（4小節）が変動すると輪唱構造は破壊され全員がユニゾンに収束してしまうため，全楽器が常に同一BPMで進むことが必須要件となる．
+時間軸で見た輪唱の構造は，\texttt{global\_bar = 6}の瞬間，
+フルートは「まばた」，クラリネットは「そらの」，オルガンは「きらきら」と別フレーズが同時に鳴ることで，時間的なズレによるハーモニーが生成される構造である．
+
+\subsection{起動・演奏開始シーケンス}
+システムの起動から最初の音が鳴るまでの流れは以下の通りである．
+以下の流れをシーケンス図にしたものを図\ref{fl:sequence}に示す．
+
+\paragraph{起動時（電源ONの直後の動作）}
+\begin{enumerate}[leftmargin=1.5em]
+  \item 電源ONによりsetup()実行
+  \item マスタからCONFIG（\texttt{entry\_offset}・\texttt{loop\_length}・\texttt{part\_id}）を各スレーブへ順次I2C送信
+  \item 全スレーブはCONFIGを受信して待機状態に入る
+\end{enumerate}
+
+\paragraph{演奏開始}
+\begin{enumerate}[leftmargin=1.5em]
+  \item ロードセルが荷重を検知しサーボモーターを起動させる．
+  \item サーボモーターが稼働しベビーメリーの回転が1周終えた段階でマスタの処理が走る．
+  \item 1周を終える時間を検知したマスタArduinoが各スレーブへSTARTを順次ユニキャストする．
+  \item マスタは内部基準テンポで小節長をカウントし，小節頭ごとにSYNC（\texttt{global\_bar} ＋ \texttt{BPM$\times$10}）を配信する．
+  \item 各楽器スレーブは，受信した\texttt{global\_bar}が自身の\texttt{entry\_offset}以上に達した瞬間から発音を開始．
+        例：クラリネット（\texttt{entry\_offset = 2}は\texttt{global\_bar = 2}のSYNCを受信した時点で楽譜の先頭から再生を開始する．
+\end{enumerate}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{fig/diagram.png}
+  \caption{システムの起動から演奏までの流れを示した図}
+  \label{fl:sequence}
+\end{figure}
+
+\clearpage
+\subsection{PLL 補正の毎小節動作}
+楽器スレーブはマスタからのSYNC受信を待たず，自前のタイマーで小節間を自走する．
+これにより通信が瞬間的に途絶えても演奏が止まらない冗長性を確保する．
+スレーブは次のマーカーが到達するであろう予測時刻を持ち，SYNC受信時に実受信時刻との差を誤差として算出する．
+誤差の30\,\%だけを次の小節長に反映する一次ローパスで位相を補正する．
+
+\begin{center}
+$\text{誤差} = \text{実受信時刻} - \text{予測時刻}, \quad
+\text{次小節長} = \text{理論値} - \text{誤差} \times 0.3$
+\end{center}
+
+補正係数0.3を採用する根拠は，速い追従（係数0.7程度）はカクつきが生じる一方，
+遅い追従（係数0.2程度）は収束が遅く輪唱のズレが目立つためであり，0.3付近が音楽的に最も自然な収束特性を示すという経験則による（実装後の調整パラメータ）．
+誤差が50\,msを超えた場合は補正ではなく強制スナップで位相を合わせ直す．
+50\,msという閾値の根拠は，人間がリズムのズレを明確に知覚し始める範囲の下限であり，これを超えると輪唱のハーモニーが破綻して聞こえるためである．
+ハイブリッド同期方式は，楽器側が SYNC 受信間（マーカー間）を自走し，受信時に位相補正を行い，急ズレ時のみ強制スナップする3段構えの構造である．
+
+\subsection{可変テンポと小節頭適用の根拠}
+BPM変更はSYNCペイロードの\texttt{BPM$\times$10}部分で楽器スレーブに伝達される．
+ただし指揮者側は，センサから読み取った目標BPMを即時には反映せず，\textbf{必ず次の小節頭でのみ}適用する．
+小節の途中でBPMを変えると楽器側の「次のマーカー予測時刻」が大きく狂い，拍が急激にズレてしまうためである
+（例：120BPM進行中に途中で140BPMへ変更すると，スレーブの予測と実受信が数百ms単位でズレ，PLL補正だけでは収束しきれない）．
+さらにBPM変化幅も「1小節あたり最大10BPM」に制限することで，PLL補正の収束範囲内に変化を抑える．
+
+\medskip
+\noindent\textbf{【情報】BPM値エンコード仕様}\\
+BPM値は\texttt{uint16\_t bpm10 = (uint16\_t)(bpm * 10)}でエンコードし，
+PAYLOAD\_H $=$ \texttt{bpm10 >> 8}，PAYLOAD\_L $=$ \texttt{bpm10 \& 0xFF}として格納する．
+デコード側は\texttt{float bpm = ((PAYLOAD\_H << 8) | PAYLOAD\_L) / 10.0f}で復元する．
+有効範囲：60〜180 BPM（bpm10 = 600〜1800）．
+\medskip
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\section{テストの設計}
+\subsection{輪唱品質評価基準}
+輪唱品質の評価基準を表\ref{tab:test420}に示す．
+\begin{table}[htbp]
+\centering
+\begin{tabular}{L{2.5cm}L{4cm}L{9cm}}
+  \toprule
+  \textbf{評価項目} & \textbf{合格基準} & \textbf{計測方法} \\
+  \midrule
+  輪唱の開始タイミング & 各Slaveが正しい\texttt{entry\_offset}で入ること & シリアルログで最初の発音タイムスタンプを確認 \\
+  楽器間同期誤差 & $\leq 30$\,ms（MOP1） & WBS 3.1と同じ手順で計測 \\
+  \bottomrule
+\end{tabular}
+\caption{WBS 3.2 輪唱品質評価基準}
+\label{tab:test420}
+\end{table}
+
+\subsubsection{同期精度計測手順}
+\begin{enumerate}
+  \item \textbf{出力設定}：マスタのシリアルにSYNC送信タイムスタンプ（micros()）を出力する
+  \item \textbf{受信記録}：各スレーブのシリアルにSYNC受信タイムスタンプを出力する
+  \item \textbf{ログ取得}：PCで両ログを記録し，送受信の差分（伝送遅延）を計算する
+  \item \textbf{誤差算出}：伝送遅延を除いた楽器間の時刻差を「同期誤差」として記録する
+  \item \textbf{判定}：100小節分の同期誤差を計測し，最大値が30ms以内を満たすことを確認する
+\end{enumerate}
+
+\subsection{全体結合演奏テスト}
+本テストはMOP1（楽器間同期誤差$\leq 30$\,ms）およびMOP2（演奏完走率10回連続完走）の達成を確認する．
+
+\subsubsection{テストシナリオ}
+\begin{enumerate}
+  \item \textbf{準備}：全5台を接続し，Processingを起動する
+  \item \textbf{CONFIGフェーズ}：マスタからCONFIGコマンドを各スレーブへ送信し，entry\_offsetが設定されることを確認する
+  \item \textbf{STARTフェーズ}：BPMを120に設定し，STARTコマンドを送信する
+  \item \textbf{演奏フェーズ}：12小節（1ループ）を完走させる
+  \item \textbf{評価}：演奏途中で音切れ・同期ずれ・クラッシュが発生しないことを確認する
+  \item \textbf{繰り返し}：上記を10回連続で実施し，完走回数を記録する
+\end{enumerate}
+
+\subsection{主観評価アンケート}
+本テストはMOP3（楽曲識別率），MOP4（楽器識別率），MOP5（リラクゼーション主観スコア）の達成を確認する．
+評価者は第三者3名以上とし，5段階評定尺度（1=全くそう思わない〜5=強くそう思う）で回答する．
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{L{1.5cm}L{8cm}L{4cm}}
+  \toprule
+  \textbf{関連MOP} & \textbf{質問内容} & \textbf{合格基準} \\
+  \midrule
+  MOP3 & この演奏はきらきら星として識別できましたか & 平均$\geq 3.5$かつ標準偏差$\leq 1.0$ \\
+  MOP4 & 各楽器音（フルート・クラリネット・オルガン・ドラム）を識別できましたか & 平均$\geq 3.5$かつ標準偏差$\leq 1.0$ \\
+  MOP5 & この演奏を聴いてリラックスできましたか & 平均$\geq 3.5$かつ標準偏差$\leq 1.0$ \\
+  \bottomrule
+\end{tabular}
+\caption{主観評価アンケート設計}
+\label{tab:questionnaire}
+\end{table}
+
+\subsection{可変テンポ動作検証}
+本テストはMOP6（BPM変更反映速度）およびMOP7（PLL収束速度）の達成を確認する．
+次の手順で可変テンポの動作テストを行う．
+
+\begin{enumerate}
+  \item \textbf{開始}：BPM=120で演奏を開始する
+  \item \textbf{増加テスト}：4小節目にセンサを操作し，BPMを120→150（+30BPM）に変更する
+  \item \textbf{収束確認}：各Slaveの収束小節数が変化量÷10以内であることを確認する
+  \item \textbf{減少テスト}：BPM=150で4小節演奏後，BPMを150→90（-60BPM）に変更する
+  \item \textbf{収束確認}：同様に収束小節数を記録する
+  \item \textbf{反映確認}：BPM変更が全Slaveへ1小節以内に反映されることを確認する
+\end{enumerate}
+
+\subsubsection{可変テンポ合否判定基準}
+可変テンポの動作テストの合格基準を次に示す．
+
+\begin{enumerate}
+  \item \textbf{反映速度}：BPM変更コマンド送信後，全スレーブへの反映が1小節以内であること
+  \item \textbf{収束速度}：BPM急変後の収束小節数が変化量（BPM）$\div 10$小節以内であること \\
+  例：BPM120→150（+30BPM）の場合，収束小節数$\leq 30 \div 10 = 3$小節
+\end{enumerate}
+
+\subsection{エンターテインメント機能テスト}
+本テストはエンターテインメント機能の動作確認として実施する．MOPとの直接対応はないが，本テストの合格が演奏開始トリガとしての信頼性を担保する．
+エンターテインメント機能テスト仕様を表\ref{tab:testspec}に示す．
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{L{4cm}L{7.5cm}}
+  \toprule
+  \textbf{テスト目的} & \textbf{合格条件} \\
+  \midrule
+  ロードセル単体検知 & 荷重印加でHX711.read()がLOAD\_THRESHOLDを超える，3回連続成功 \\
+  しきい値調整 & LOAD\_THRESHOLD設定値で10回中10回正常検知 \\
+  サーボ停止値キャリブレーション & \texttt{SERVO\_STOP}送信後5秒以上静止 \\
+  状態遷移テスト & IDLE→PLAYING→FINISHED→IDLEが正順で遷移 \\
+  自動リセットテスト & FINISHED遷移から30秒±2秒でIDLEへ復帰 \\
+  チャタリング除去テスト & 1周につき遷移メッセージが1回のみ出力 \\
+  \bottomrule
+\end{tabular}
+\caption{エンターテインメント機能 テスト仕様一覧}
+\label{tab:testspec}
+\end{table}
+
+\paragraph{制約・注意事項}
+\begin{itemize}
+  \item サーボとシャフトの接続はグルーガンで十分に固定し，回転中に外れないようにする
+  \item \texttt{SERVO\_STOP}は個体差があるため，キャリブレーションを実施してから本番コードに反映する
+  \item \texttt{LOAD\_THRESHOLD}はロードセル個体差があるため，閾値調整したうえで実測値を反映する
+  \item トリガの誤作動を防止するため，PLAYING中はロードセル検知を必ず無視する
+\end{itemize}
+
+\begin{thebibliography}{99}
+
+\bibitem{ref:tanaka2020} 田中ミカ，荒武幸代，田中雄二「大学生のメンタルヘルス状況と身近な相談環境に関する調査」
+CAMPUS HEALTH, 57(2), pp.142--147, 2020年．
+
+\bibitem{ref:wathelet2020} Wathelet, M., et al., "Factors Associated With Mental Health Disorders Among University Students in France Confined During the COVID-19 Pandemic", JAMA Network Open, 2020.
+
+\bibitem{ref:harada2025} 原田ら「メンタル不調による生産性損失の全国推計」横浜市立大学プレスリリース（AMED・厚生労働省支援），2025年．\\
+\url{https://www.yokohama-cu.ac.jp/news/2025/}
+
+\bibitem{ref:soudanshitsu} 日本学生相談学会「学生相談機関ガイドライン」\\
+\url{https://www.gakuseisodan.com/} 2026年4月参照．
+
+\bibitem{ref:smartphone_stress} 総務省情報通信政策研究所「情報通信メディアの利用時間と情報行動に関する調査」\\
+\url{https://www.soumu.go.jp/iicp/research/results/media_usage-time.html} 2026年4月参照．
+
+\bibitem{ref:usen} USEN「店舗BGM放送サービス」\\
+\url{https://www.usen.com/} 2026年4月参照．
+
+\bibitem{ref:ilie2013} Ilie, G., \& Rehana, R. (2013). Effects of Individual Music Playing and Music Listening on Acute-Stress Recovery. \textit{Canadian Journal of Music Therapy}, 19(1), 22--48.\\
+
+\bibitem{ref:lago} Lago, N. P. \& Kon, F. (2004), The Quest for Low Latency. \textit{Proceedings of the International Computer Music Conference (ICMC)}.
+
+\bibitem{ref:iowa} L. Fritts, "University of Iowa Musical Instrument Samples", The University of Iowa Electronic Music Studios, [Online]. Available: \url{https://theremin.music.uiowa.edu/MIS.html}, 1997, Accessed:2026.
+
+\bibitem{ref:leeds} Samplephonics, "The Leeds Town Hall Organ - Free Sample Library", [Online]. Available: \url{https://www.samplephonics.com/products/free/sampler-instruments/the-leeds-town-hall-organ}, Accessed: 2026.
+
+
+\end{thebibliography}
+
+
+\end{document}
