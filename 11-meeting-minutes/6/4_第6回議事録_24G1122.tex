@@ -1,0 +1,132 @@
+\documentclass[a4paper,12pt]{ltjsarticle}
+\usepackage[top=25mm,bottom=25mm,left=25mm,right=25mm]{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{caption}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{第6回議事録}}\\[8pt]
+  {\large チーム4}
+\end{center}
+
+\vspace{4mm}
+
+%-------------------------------------------------------------------
+\section*{1.基本情報}
+\begin{tabular}{ll}
+  \toprule
+  日時     & 2026年5月27日（水） \\
+  会議場所 & 731教室 \\
+  目的     & 進捗報告 \\
+  チーム番号 & 4 \\
+  議事録作成者 & 細澤悠真 \\
+  \bottomrule
+\end{tabular}
+
+\vspace{4mm}
+\noindent\textbf{参加者}
+
+\begin{tabular}{ll}
+  2年 & 山口汐里，佐藤夏美，成毛海人 \\
+  3年 & 細澤悠真，武本龍，酒井睦基 \\
+\end{tabular}
+
+%-------------------------------------------------------------------
+\section*{2.議題一覧}
+\begin{enumerate}[label=議題\arabic*：]
+  \item 議論して決まった内容
+  \item 計画からの変更点
+  \item 個人毎の次回までに実施する内容
+\end{enumerate}
+
+%-------------------------------------------------------------------
+\section*{3.議題ごとの内容}
+
+\subsection*{議題①：議論して決まった内容}
+\subsubsection*{決定事項}
+\begin{itemize}[leftmargin=1.5em]
+  \item 来週TAへ提出する成果物を以下のとおり定めた．
+  \begin{itemize}
+    \item PMメンバーは，GitHub Projectで管理しているガントチャートと進捗状況を共有する．今後，期限を過ぎてタスクが遅延している場合は，遅延しているタスクに対応する施策をガントチャートの項目として追加する．
+    \item 実装メンバー（2年生）は，各楽器音の完成およびArduino間の送受信処理を見せられる状態で提出する．
+  \end{itemize}
+  \item Zulipのコメント数が少ないと指摘を受けたため，これまでSlack上で行っていた会話を徐々にZulip上へ移行する．
+  \item GitHub Project上に全期間のスケジュール（タスク）項目を追加し，計画書に沿ったガントチャートを実装する．
+  \item 来週授業日までに，連続回転サーボモータとポテンショメータを購入する．
+\end{itemize}
+
+\subsubsection*{議論内容}
+\begin{itemize}[leftmargin=1.5em]
+  \item 担当TAによる聞き取り調査の際，Zulipの活用度が低い点を指摘された．Zulipのコメント数が評価点に直結するため，コメント数が少ないと定期的に指摘される恐れがある．これを受け，Slack上での会話をZulipへ移行する方針とした．
+\end{itemize}
+
+\subsubsection*{ToDo / アクション}
+\begin{itemize}[leftmargin=1.5em]
+  \item 連続回転サーボモータ・ポテンショメータの購入（期限：来週授業日まで）……細澤
+  \item GitHub Projectへ全期間のスケジュール項目を追加し，計画書準拠のガントチャートを実装……武本
+  \item Slack上の会話をZulipへ移行……酒井・細澤
+  \item 各楽器音の完成（フルート＝山口／クラリネット＝佐藤／ドラム・オルガン＝成毛），およびArduino間の送受信処理（山口・佐藤）（期限：来週まで）
+\end{itemize}
+
+\subsubsection*{保留・次回検討事項}
+\begin{itemize}[leftmargin=1.5em]
+  \item 進捗に応じて，最終成果物の最低限ライン（MVP）を更新する．
+\end{itemize}
+
+%-------------------------------------------------------------------
+\subsection*{議題②：計画からの変更点}
+
+\subsubsection*{決定事項}
+\begin{itemize}[leftmargin=1.5em]
+  \item 計画書・スケジュールからの変更は現状なし．
+\end{itemize}
+
+\subsubsection*{議論内容}
+特になし．
+
+\subsubsection*{ToDo / アクション}
+特になし．
+
+\subsubsection*{保留・次回検討事項}
+特になし．
+
+%-------------------------------------------------------------------
+\subsection*{議題③：個人毎の次回までに実施する内容}
+
+\subsubsection*{決定事項}
+各メンバーが次回（6月3日）までに実施する内容は，議題①のToDoのとおりとする．担当ごとの内訳を以下に示す．
+\begin{itemize}[leftmargin=1.5em]
+  \item 山口……フルート音色の完成，Arduino間の送受信処理
+  \item 佐藤……クラリネット音色の完成，Arduino間の送受信処理
+  \item 成毛……ドラム・オルガン音色の完成
+  \item 細澤……連続回転サーボモータ・ポテンショメータの購入，Slack$\to$Zulip移行
+  \item 武本……GitHub Projectへ全期間のスケジュール項目を追加（計画書準拠のガントチャート実装）
+  \item 酒井……Slack$\to$Zulip移行
+\end{itemize}
+
+\subsubsection*{議論内容}
+特になし．
+
+\subsubsection*{ToDo / アクション}
+議題①のとおり．
+
+\subsubsection*{保留・次回検討事項}
+特になし．
+
+%-------------------------------------------------------------------
+\section*{4.次回予定}
+\begin{tabular}{ll}
+  \toprule
+  日時・場所 & 2026年6月3日（水）・731教室 \\
+  議題       & 特になし \\
+  その他，特記事項 & 特になし \\
+  \bottomrule
+\end{tabular}
+
+\end{document}
