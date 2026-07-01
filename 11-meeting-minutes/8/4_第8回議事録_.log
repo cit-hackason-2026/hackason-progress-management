@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.18.0 (TeX Live 2024)  (format=lualatex 2024.5.19)  23 APR 2026 12:12
+This is LuaHBTeX, Version 1.18.0 (TeX Live 2024)  (format=lualatex 2024.5.17)  10 JUN 2026 17:24
  restricted system commands enabled.
 **4_第8回議事録_.tex
 (./4_第8回議事録_.tex
@@ -8,8 +8,8 @@ Lua module: luaotfload 2024-02-14 3.28 Lua based OpenType font support
 Lua module: lualibs 2023-07-13 2.76 ConTeXt Lua standard libraries.
 Lua module: lualibs-extended 2023-07-13 2.76 ConTeXt Lua libraries -- extended c
 ollection.
-luaotfload | conf : Root cache directory is "/Users/nyanko/Library/texlive/2024/
-texmf-var/luatex-cache/generic/names".
+luaotfload | conf : Root cache directory is "/Users/yuumaro/Library/texlive/2024
+/texmf-var/luatex-cache/generic/names".
 luaotfload | init : Loading fontloader "fontloader-2023-12-28.lua" from kpse-res
 olved path "/usr/local/texlive/2024/texmf-dist/tex/luatex/luaotfload/fontloader-
 2023-12-28.lua".
@@ -20,8 +20,8 @@ Inserting `luaotfload.node_processor' in `hpack_filter'.
 Inserting `luaotfload.glyph_stream' in `glyph_stream_provider'.
 Inserting `luaotfload.define_font' in `define_font'.
 Lua-only attribute luaotfload_color_attribute = 2
-luaotfload | conf : Root cache directory is "/Users/nyanko/Library/texlive/2024/
-texmf-var/luatex-cache/generic/names".
+luaotfload | conf : Root cache directory is "/Users/yuumaro/Library/texlive/2024
+/texmf-var/luatex-cache/generic/names".
 Inserting `luaotfload.harf.strip_prefix' in `find_opentype_file'.
 Inserting `luaotfload.harf.strip_prefix' in `find_truetype_file'.
 Removing  `luaotfload.glyph_stream' from `glyph_stream_provider'.
@@ -309,9 +309,9 @@ LaTeX Info: Redefining \fontshapeforce on input line 955.
 )
 (/usr/local/texlive/2024/texmf-dist/tex/luatex/luatexja/patches/lltjdefs.sty
 Package: lltjdefs 2022-01-23 Default font settings of LuaTeX-ja
-luaotfload | db : Font names database loaded from /Users/nyanko/Library/texlive/
-2024/texmf-var/luatex-cache/generic/names/luaotfload-names.luc.gz(load cache: ex
-tra_lmroman10-regular.luc)
+luaotfload | db : Font names database loaded from /Users/yuumaro/Library/texlive
+/2024/texmf-var/luatex-cache/generic/names/luaotfload-names.luc.gz(load cache: e
+xtra_lmroman10-regular.luc)
 LaTeX Font Info:    Font shape `JT3/mc/m/n' will be
 (Font)              scaled to size 9.24713pt on input line 79.
 
@@ -810,10 +810,16 @@ LaTeX Font Info:    Font shape `JT3/gt/m/n' will be
 (Font)              scaled to size 9.24713pt on input line 52.
 LaTeX Font Info:    Font shape `JY3/gt/m/n' will be
 (Font)              scaled to size 9.24713pt on input line 52.
-(load cache: extra_lmsans10-regular.luc) [1
+(load cache: extra_lmsans10-regular.luc)(load cache: extra_lmmono10-regular.luc)
+ [1
 
-{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2]
-(./4_第8回議事録_.aux)
+{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2] [3]
+
+Overfull \hbox (168.0541pt too wide) in paragraph at lines 149--156
+[][][][] 
+ []
+
+[4] (./4_第8回議事録_.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-04-11>
@@ -823,27 +829,30 @@ Package rerunfilecheck Info: File `4_第8回議事録_.out' has not changed.
 )
 
 Here is how much of LuaTeX's memory you used:
- 12876 strings out of 476381
+ 12883 strings out of 476381
  125244,1977958 words of node,token memory allocated
- 841 words of node memory still in use:
-   7 hlist, 1 vlist, 4 rule, 2 glue, 3 kern, 1 glyph, 140 attribute, 54 glue_spe
-c, 21 attribute_list, 1 write, 9 user_defined nodes
-   avail lists: 1:16,2:18709,3:283,4:307,5:71,6:48,7:1912,8:1,9:925,10:7
- 34749 multiletter control sequences out of 65536+600000
- 46 fonts using 40623591 bytes
- 125i,6n,128p,1927b,339s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 817 words of node memory still in use:
+   7 hlist, 1 vlist, 4 rule, 2 glue, 3 kern, 1 glyph, 129 attribute, 54 glue_spe
+c, 20 attribute_list, 1 write, 9 user_defined nodes
+   avail lists: 1:16,2:35004,3:474,4:352,5:98,6:60,7:3945,8:1,9:1668,10:9,11:18
+ 34754 multiletter control sequences out of 65536+600000
+ 47 fonts using 40749679 bytes
+ 125i,6n,128p,1927b,474s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2024/texmf-dist/fonts/opentype/public/lm/lmsans10-regular.ot
-f></usr/local/texlive/2024/texmf-dist/fonts/opentype/public/lm/lmroman10-regular
-.otf></usr/local/texlive/2024/texmf-dist/fonts/opentype/public/lm/lmsans12-regul
-ar.otf></usr/local/texlive/2024/texmf-dist/fonts/opentype/public/lm/lmroman12-re
-gular.otf></usr/local/texlive/texmf-local/fonts/opentype/cjk-gs-integrate/Harano
-AjiMincho-Regular.otf></usr/local/texlive/2024/texmf-dist/fonts/opentype/public/
-lm/lmroman12-bold.otf></usr/local/texlive/texmf-local/fonts/opentype/cjk-gs-inte
-grate/HaranoAjiGothic-Medium.otf>
-Output written on 4_第8回議事録_.pdf (2 pages, 46005 bytes).
+f></usr/local/texlive/2024/texmf-dist/fonts/opentype/public/lm/lmroman10-bold.ot
+f></usr/local/texlive/2024/texmf-dist/fonts/opentype/public/lm/lmmono10-regular.
+otf></usr/local/texlive/2024/texmf-dist/fonts/opentype/public/lm/lmroman10-regul
+ar.otf></usr/local/texlive/2024/texmf-dist/fonts/opentype/public/lm/lmsans12-reg
+ular.otf></usr/local/texlive/2024/texmf-dist/fonts/opentype/public/lm/lmroman12-
+regular.otf></usr/local/texlive/texmf-local/fonts/opentype/cjk-gs-integrate/Hara
+noAjiMincho-Regular.otf></usr/local/texlive/2024/texmf-dist/fonts/opentype/publi
+c/lm/lmroman12-bold.otf></usr/local/texlive/texmf-local/fonts/opentype/cjk-gs-in
+tegrate/HaranoAjiGothic-Medium.otf></usr/local/texlive/2024/texmf-dist/fonts/typ
+e1/public/amsfonts/cm/cmsy10.pfb>
+Output written on 4_第8回議事録_.pdf (4 pages, 126148 bytes).
 
-PDF statistics: 88 PDF objects out of 1000 (max. 8388607)
- 62 compressed objects within 1 object stream
- 25 named destinations out of 1000 (max. 131072)
+PDF statistics: 114 PDF objects out of 1000 (max. 8388607)
+ 79 compressed objects within 1 object stream
+ 27 named destinations out of 1000 (max. 131072)
  1 words of extra memory for PDF output out of 10000 (max. 100000000)
 
