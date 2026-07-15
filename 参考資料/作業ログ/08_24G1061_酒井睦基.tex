@@ -1,0 +1,389 @@
+\documentclass[a4paper,12pt]{ltjsarticle}
+\usepackage[top=25mm,bottom=25mm,left=25mm,right=25mm]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{luatexja} 
+\usepackage{tabularx}
+
+\setlist[itemize]{leftmargin=2em}
+\setlist[itemize,2]{leftmargin=2em}
+\setlist[enumerate]{leftmargin=2em}
+\setlist[enumerate,2]{leftmargin=2em}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+% セクション見出しのスタイル
+\titleformat{\section}{\large\bfseries}{第\thesection 節}{1em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
+
+% ---- listings 共通設定 ----
+\lstset{
+  basicstyle      = \ttfamily\small,
+  keywordstyle    = \color[HTML]{0000CC}\bfseries,
+  commentstyle    = \color[HTML]{008000}\itshape,
+  stringstyle     = \color[HTML]{CC0000},
+  numberstyle     = \ttfamily\footnotesize\color{gray},
+  numbers         = left,          % 行番号を左に
+  numbersep       = 10pt,
+  stepnumber      = 1,
+  frame           = single,        % 枠線
+  framesep        = 6pt,
+  rulecolor       = \color{gray!40},
+  backgroundcolor = \color[HTML]{F7F7F7},
+  breaklines      = true,          % 長い行を折り返す
+  breakatwhitespace = false,
+  showstringspaces= false,
+  tabsize         = 4,
+  captionpos      = b,             % キャプションを下に
+  xleftmargin     = 18pt,          % 行番号のはみ出し対策
+  % --- 日本語コメント対策(lualatex) ---
+  extendedchars   = true,
+}
+\renewcommand{\lstlistingname}{ソースコード}
+
+\begin{document}
+
+% ヘッダ情報
+\begin{center}
+  {\LARGE\bfseries 作業ログ}
+\end{center}
+
+\vspace{4mm}
+
+\begin{tabular}{ll}
+  \textbf{報告者} & 酒井 睦基 \\
+  \textbf{報告日} & \today \\
+  \textbf{プロジェクト名} & Arduino オーケストラ：きらきら星 輪唱演奏システム \\
+\end{tabular}
+
+\vspace{6mm}
+
+%-------------------------------------------------------------------
+\section{進捗サマリー（要約）}
+
+\begin{itemize}
+  \item \textbf{全体進捗率}：70 [\%]
+  \item \textbf{マイルストーン達成状況}：未達成
+  \item \textbf{主要成果}：
+    \begin{itemize}
+      \item マスタ1台とスレーブ4台の輪唱が完成
+      \item ハードウェア部分の材料の調達完了
+      \item 装置の設計図と土台，回転部分が8割完成
+    \end{itemize}
+  \item \textbf{未達成要項}：
+    \begin{itemize}
+      \item 回転部分とサーボモータを繋ぐ連結要素の作成
+      \item 開始トリガ部分の作成
+    \end{itemize}
+  \item \textbf{重大課題（影響度：高）}：開始トリガ部分の作成を終わらせ，
+  \item \textbf{重大課題（影響度：中）}：ポテンショメータが確保できたため担当者に渡して可変テンポ機能の実装を進めてもらう
+\end{itemize}
+
+%-------------------------------------------------------------------
+\section{作業ログ（詳細トラッキング）}
+
+\begin{longtable}{C{2cm}C{1.6cm}C{1.6cm}C{2.2cm}C{1.2cm}L{2.4cm}L{3cm}}
+  \toprule
+  \textbf{作業項目} & \textbf{開始日} & \textbf{予定完了日} & \textbf{状態} & \textbf{進捗率} & \textbf{依存関係・ブロッカー} & \textbf{コメント} \\
+  \midrule
+  \endfirsthead
+  \toprule
+  \textbf{作業項目} & \textbf{開始日} & \textbf{予定完了日} & \textbf{状態} & \textbf{進捗率} & \textbf{依存関係・ブロッカー} & \textbf{コメント} \\
+  \midrule
+  \endhead
+  \midrule
+  \endfoot
+  \bottomrule
+  \endlastfoot
+  ベビーメリー風回転装置制作 & 6/3 & 6/23 & 進行中 & 50\% & 材料の調達と設計図が完成し，現在は設計を進めている & 輪唱システムは完成しているためハードウェアの完成に力を入れる \\
+  ロードセルの反応検証 & 6/10 & 6/23 & 進行中 & 50\% & ロードセルが荷重を検知することを確認した & 閾値の調査を2年生に任せる \\
+  センサ入力・BPM変換処理 & 6/3 & 6/23 & 進行中 & 10\% & ポテンショメータが確保できた & 6/17のMTGで2年生にポテンショメータを渡し制作を任せる
+\end{longtable}
+
+%-------------------------------------------------------------------
+\section{技術成熟度レベルTRLの推移}
+%-------------------------------------------------------------------
+FBSの各要素ごとに現在どのレベルにいるかを以下に示す．
+
+\begin{longtable}{L{2.5cm}L{4cm}C{2cm}C{2cm}L{3.5cm}}
+  \toprule
+  \textbf{機能} & \textbf{説明} & \textbf{前回TRL} & \textbf{今回TRL} & \textbf{備考} \\
+  \midrule
+  \endfirsthead
+  \toprule
+  \textbf{機能} & \textbf{説明} & \textbf{前回TRL} & \textbf{今回TRL} & \textbf{備考} \\
+  \midrule
+  \endhead
+  \midrule
+  \endfoot
+  \bottomrule
+  \endlastfoot
+  I2C同期（F1） & マスタ→スレーブ同期通信 & 2 & 4 & マスタ1台，スレーブ4台の接続を確認できた \\
+  音色合成（F4） & Processing加算合成 & 2 & 4 & 4種類の楽器音を判別できるレベルで確認できた \\
+  PLL補正（F1.3） & 位相同期制御 & 1 & 1 & 設計中 \\
+  エンタメ機能（F5） & ロードセル・サーボ制御 & 1 & 2 & ロードセル，サーボモータともにArduinoを用いた動作確認を行った \\
+  可変テンポ（F2） & BPM制御 & 1 & 1 & 設計中 \\
+  共通ライブラリ（F3.1） & PROGMEM＋I2Cフレーム & 2 & 4 & 共通ライブラリの確認と2年生間の共有を確認できた \\
+\end{longtable}
+
+\noindent
+{\small
+\begin{tabular}{ll}
+  \textbf{TRL} & \textbf{定義} \\
+  1 & 概念レベル：アイディアや原理が確立されており，説明できるレベル \\
+  2 & 基本動作レベル：単体で動作確認が可能なレベル \\
+  3 & 結合動作レベル：機能を結合し，実際の使用環境に近い環境で動作確認が可能なレベル \\
+  4 & 実運用レベル：実際の使用環境で安定的な稼働が確認できるレベル \\
+\end{tabular}
+}
+
+%-------------------------------------------------------------------
+\section{技術性能指標TPMの推移} 
+%-------------------------------------------------------------------
+MOPの各要素毎に現在の値の程度を以下に示す．
+
+\begin{longtable}{L{2cm}L{3cm}C{2cm}C{2cm}C{2cm}L{2.5cm}}
+  \toprule
+  \textbf{関連MOP} & \textbf{指標} & \textbf{目標値} & \textbf{前回値} & \textbf{今回値} & \textbf{備考} \\
+  \midrule
+  \endfirsthead
+  \toprule
+  \textbf{関連MOP} & \textbf{指標} & \textbf{目標値} & \textbf{前回値} & \textbf{今回値} & \textbf{備考} \\
+  \midrule
+  \endhead
+  \midrule
+  \endfoot
+  \bottomrule
+  \endlastfoot
+  MOP1 & 楽器間同期誤差 & $\leq 30$\,ms & --- & --- & 未計測 \\
+  MOP2 & I2C SYNCパケットロス率 & 0回 & --- & --- & 未計測 \\
+  MOP3 & 楽曲識別（中間確認） & チーム内識別 & --- & 識別可能 & 実施済 \\
+  MOP4 & 楽器識別（中間確認） & チーム内識別 & --- & 識別可能 & 実施済 \\
+  MOP5 & リラクゼーション感 & 心地よく聞こえる & --- & --- & 未実施 \\
+  MOP6 & BPM変更反映速度 & 1小節以内 & --- & --- & 未計測 \\
+  MOP7 & PLL収束速度 & 変化量$\div$10小節以内 & --- & --- & 未計測 \\
+\end{longtable}
+
+\subsection{現在のガントチャート}
+現在のガントチャートの状態を図\ref{fig:gc}に示す．
+灰色の箇所は実装が完了を示す．
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{fig/gc_current.png}
+  \caption{現在のガントチャート}
+  \label{fig:gc}
+\end{figure}
+
+\subsection{日毎の作業時間と作業内容}
+定期的にGitHubを確認しPRがきていないかどうかを確認する．
+PRがきていた場合はファイルの内容をレビューし，問題がない場合はmergeする．
+基本的な作業時間はGitHubの確認とコードレビューを含め1時間程度である．
+また，エンタメ要素の設計のために材料の確保と設計図の作成，土台部分とベビーメリーの回転飾りを作成した．
+基本的な作業時間は材料の調達で2時間，設計図の作成で1時間，土台部分とベビーメリーの回転飾りの作成に2時間程度を要した．
+
+%-------------------------------------------------------------------
+\section{課題管理}
+\begin{itemize}
+  \item \textbf{課題}：筐体設計
+    \begin{itemize}
+      \item \textbf{発生原因}：ハードウェア部分の作成が未完
+      \item \textbf{影響度}：高
+      \item \textbf{優先度}：高
+      \item \textbf{対策}：3年生が主体となり9週目でハードウェア部分を完成させる
+      \item \textbf{期限}：6/23
+      \item \textbf{状態}：対応中
+    \end{itemize}
+\end{itemize}
+
+% \noindent
+% {\small ※影響度＝プロジェクトへのインパクト \quad ※優先度＝対応の緊急性}
+
+%-------------------------------------------------------------------
+\section{AI利用状況と検証（再現性重視）}
+サーボモーターとロードセルのテスト用のコード作成に使用した．
+
+\subsection{利用内容}
+\begin{itemize}
+  \item \textbf{利用目的}：サーボモーターとロードセルのテスト
+  \item \textbf{入力（プロンプト要旨）}：Arduinoでサーボモーターとロードセルを動かすコードを書いて
+  \item \textbf{出力概要}：ソースコード\ref{code:servo}と\ref{code:load}が作成された
+\end{itemize}
+
+\begin{lstlisting}[language=C++, caption=サーボモーター用テストコード, label={code:servo}]
+#include <Servo.h>
+
+Servo servo;
+
+void setup() {
+  servo.attach(9);  // 信号線をデジタル9番ピンに接続
+}
+
+void loop() {
+  // 0度 → 180度
+  for (int pos = 0; pos <= 180; pos++) {
+    servo.write(pos);
+    delay(15);  // サーボが追いつくのを待つ
+  }
+  // 180度 → 0度
+  for (int pos = 180; pos >= 0; pos--) {
+    servo.write(pos);
+    delay(15);
+  }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=C++, caption=ロードセル用テストコード, label={code:load}]
+#include "HX711.h"
+
+const int DT_PIN  = 3;
+const int SCK_PIN = 2;
+
+HX711 scale;
+float calibration_factor = 2280;  // ここを後で調整する
+
+void setup() {
+  Serial.begin(9600);
+  scale.begin(DT_PIN, SCK_PIN);
+  scale.set_scale();
+  scale.tare();  // 何も載せてない状態を0にする（ゼロ点調整）
+  Serial.println("ゼロ点調整完了。重さの分かる物を載せてください。");
+}
+
+void loop() {
+  scale.set_scale(calibration_factor);
+  Serial.print("重さ: ");
+  Serial.print(scale.get_units(), 1);  // 小数1桁
+  Serial.println(" g");
+
+  // シリアルモニタで a/z キーで係数を増減して調整
+  if (Serial.available()) {
+    char c = Serial.read();
+    if (c == 'a') calibration_factor += 10;
+    if (c == 'z') calibration_factor -= 10;
+    Serial.print("calibration_factor = ");
+    Serial.println(calibration_factor);
+  }
+}
+\end{lstlisting}
+
+\subsection{検証方法}
+
+\begin{itemize}
+  \item \textbf{検証手法}：
+    \begin{itemize}
+      \item サーボモーターとロードセルを使って実際に動かした
+    \end{itemize}
+  \item \textbf{参照資料}：
+    \begin{itemize}
+      \item テストコードであるため参考にした資料はない
+    \end{itemize}
+  \item \textbf{検証手順}：
+    \begin{enumerate}
+      \item 手順1：Arduinoと各センサの配線を繋ぐ
+      \item 手順2：コードを実行
+    \end{enumerate}
+\end{itemize}
+
+\subsection{ファクトチェック結果}
+\begin{itemize}
+  \item \textbf{一致点}：
+    \begin{itemize}
+      \item サーボモータは回転の動作確認ができ，ロードセルはシリアルモニタで荷重の検知が確認できた
+    \end{itemize}
+  \item \textbf{不一致・疑義}：
+    \begin{itemize}
+      \item あくまでテスト用であり本番で同じコードは使用しないため問題はないと考えている
+    \end{itemize}
+  \item \textbf{最終判断}：テスト用として採用
+  \item \textbf{根拠}：
+    \begin{itemize}
+      \item 各センサで動作が確認できたため
+    \end{itemize}
+\end{itemize}
+
+%-------------------------------------------------------------------
+\section{次回計画}
+
+\begin{itemize}
+  \item \textbf{3年生}：
+    \begin{itemize}
+      \item WBS 1.4：ベビーメリー風装置の設計・製作（全員）
+    \end{itemize}
+  \item \textbf{2年生}：
+    \begin{itemize}
+      \item WBS 1.5：ロードセルの反応検証（全員）
+      \item WBS 2.2，2.2.1：BPM変化による可変テンポ機能を実装（成毛）
+      \item WBS 2.3.2：PLL補正アルゴリズムの実装（佐藤・山口）
+    \end{itemize}
+  \item \textbf{期限}：6/23（第9週末）
+\end{itemize}
+
+%-------------------------------------------------------------------
+\section{その他}
+
+\begin{itemize}
+  \item TPMの確認のため6/17のMTGでは楽器間同期誤差とSYNCパケットロスのテストを行う．
+\end{itemize}
+
+%-------------------------------------------------------------------
+\section{付録}
+
+\begin{itemize}
+  \item \textbf{添付資料}：
+
+      \begin{figure}[htbp]
+        \centering
+        \includegraphics[width=\linewidth]{fig/design.png}
+        \caption{ハードウェア部分の設計}
+        \label{fig:design}
+      \end{figure}
+
+      \begin{figure}[htbp]
+        \centering
+        \includegraphics[width=\linewidth]{fig/start_toggle.png}
+        \caption{開始トリガ部分の設計}
+        \label{fig:start}
+      \end{figure}
+
+      \begin{table}[htbp]
+        \centering
+        \caption{購入材料一覧}
+        \label{tab:materials}
+        \begin{tabularx}{\textwidth}{l r r r X}
+          \hline
+          材料 & 単価(円) & 数量 & 小計(円) & 使用用途 \\
+          \hline
+          木の板   & 110 & 3 & 330 & Arduino5つと開始トリガ，ベビーメリー装置を乗せておく土台として購入 \\
+          針金     & 110 & 1 & 110 & ベビーメリーの傘部分作成のため購入 \\
+          ハンマー & 220 & 1 & 220 & 土台に木の棒を刺す際に使用するために購入 \\
+          きり     & 110 & 1 & 110 & 土台に木の棒を刺す用の穴を作るために購入 \\
+          割り箸   & 110 & 1 & 110 & 土台に刺し柱として活用するために購入 \\
+          木の棒   & 110 & 2 & 220 & 割り箸では太さが不均一であったため代替品として購入 \\
+          バネ     & 180 & 2 & 360 & 柱の下に設置しスマホなどの小物を乗せたときだけロードセルに乗せるために購入 \\
+          釘       & 110 & 1 & 110 & 柱を土台に繋ぐために購入 \\
+          糸       & 110 & 1 & 110 & 針金から飾りを吊るすために購入 \\
+          各種飾り & 110 & 2 & 220 & ベビーメリーのぶら下がっている飾りを表現するために購入 \\
+          ストロー & 110 & 1 & 110 & ベビーメリーの飾り部分とサーボモーター部分をつなぐ柱として購入 \\
+          ヤスリ   & 110 & 1 & 110 & 空けた穴や切った棒の表面を滑らかにするために購入 \\
+          \hline
+          \multicolumn{3}{r}{合計} & 2120 & \\
+          \hline
+        \end{tabularx}
+      \end{table}
+\end{itemize}
+
+\clearpage
+\begin{itemize}
+  \item \textbf{添付範囲}：一部（ベビーメリー装置は計画書にて記載済みであるためここでは省略する）
+\end{itemize}
+
+\end{document}
