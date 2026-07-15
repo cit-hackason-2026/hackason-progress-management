@@ -1,0 +1,304 @@
+\documentclass[a4paper,12pt]{ltjsarticle}
+\usepackage[top=25mm,bottom=25mm,left=25mm,right=25mm]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{luatexja} 
+\usepackage{tabularx}
+\usepackage{hyperref}
+
+\setlist[itemize]{leftmargin=2em}
+\setlist[itemize,2]{leftmargin=2em}
+\setlist[enumerate]{leftmargin=2em}
+\setlist[enumerate,2]{leftmargin=2em}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+% セクション見出しのスタイル
+\titleformat{\section}{\large\bfseries}{第\thesection 節}{1em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
+
+% ---- listings 共通設定 ----
+\lstset{
+  basicstyle      = \ttfamily\small,
+  keywordstyle    = \color[HTML]{0000CC}\bfseries,
+  commentstyle    = \color[HTML]{008000}\itshape,
+  stringstyle     = \color[HTML]{CC0000},
+  numberstyle     = \ttfamily\footnotesize\color{gray},
+  numbers         = left,          % 行番号を左に
+  numbersep       = 10pt,
+  stepnumber      = 1,
+  frame           = single,        % 枠線
+  framesep        = 6pt,
+  rulecolor       = \color{gray!40},
+  backgroundcolor = \color[HTML]{F7F7F7},
+  breaklines      = true,          % 長い行を折り返す
+  breakatwhitespace = false,
+  showstringspaces= false,
+  tabsize         = 4,
+  captionpos      = b,             % キャプションを下に
+  xleftmargin     = 18pt,          % 行番号のはみ出し対策
+  % --- 日本語コメント対策(lualatex) ---
+  extendedchars   = true,
+}
+\renewcommand{\lstlistingname}{ソースコード}
+
+\begin{document}
+
+% ヘッダ情報
+\begin{center}
+  {\LARGE\bfseries 作業ログ}
+\end{center}
+
+\vspace{4mm}
+
+\begin{tabular}{ll}
+  \textbf{報告者} & 酒井 睦基 \\
+  \textbf{報告日} & \today \\
+  \textbf{プロジェクト名} & Arduino オーケストラ：きらきら星 輪唱演奏システム \\
+\end{tabular}
+
+\vspace{6mm}
+
+%-------------------------------------------------------------------
+\section{進捗サマリー（要約）}
+
+\begin{itemize}
+  \item \textbf{全体進捗率}：98 [\%]
+  \item \textbf{マイルストーン達成状況}：未達成
+  \item \textbf{主要成果}：
+    \begin{itemize}
+      \item アンケート項目の決定
+    \end{itemize}
+  \item \textbf{未達成要項}：
+    \begin{itemize}
+      \item アンケートの実施
+    \end{itemize}
+  \item \textbf{重大課題（影響度：低）}：7/8（水）のMTGでアンケートを実施する
+\end{itemize}
+
+%-------------------------------------------------------------------
+\section{作業ログ（詳細トラッキング）}
+
+\begin{longtable}{C{2cm}C{1.6cm}C{1.6cm}C{2.2cm}C{1.2cm}L{2.4cm}L{3cm}}
+  \toprule
+  \textbf{作業項目} & \textbf{開始日} & \textbf{予定完了日} & \textbf{状態} & \textbf{進捗率} & \textbf{依存関係・ブロッカー} & \textbf{コメント} \\
+  \midrule
+  \endfirsthead
+  \toprule
+  \textbf{作業項目} & \textbf{開始日} & \textbf{予定完了日} & \textbf{状態} & \textbf{進捗率} & \textbf{依存関係・ブロッカー} & \textbf{コメント} \\
+  \midrule
+  \endhead
+  \midrule
+  \endfoot
+  \bottomrule
+  \endlastfoot
+  最終発表・報告（アンケート集計） & 7/1 & 7/8 & 進行中 & 50\% & アンケート項目を決定したため7/8のシステム評価の会で集計を取る & \\
+\end{longtable}
+
+%-------------------------------------------------------------------
+\section{技術成熟度レベルTRLの推移}
+%-------------------------------------------------------------------
+FBSの各要素ごとに現在どのレベルにいるかを以下に示す．
+
+\begin{longtable}{L{2.5cm}L{4cm}C{2cm}C{2cm}L{3.5cm}}
+  \toprule
+  \textbf{機能} & \textbf{説明} & \textbf{前回TRL} & \textbf{今回TRL} & \textbf{備考} \\
+  \midrule
+  \endfirsthead
+  \toprule
+  \textbf{機能} & \textbf{説明} & \textbf{前回TRL} & \textbf{今回TRL} & \textbf{備考} \\
+  \midrule
+  \endhead
+  \midrule
+  \endfoot
+  \bottomrule
+  \endlastfoot
+  I2C同期（F1） & マスタ→スレーブ同期通信 & 4 & 4 & マスタ1台，スレーブ4台の接続を確認できた \\
+  音色合成（F4） & Processing加算合成 & 4 & 4 & 4種類の楽器音を判別できるレベルで確認できた \\
+  PLL補正（F1.3） & 位相同期制御 & 4 & 4 & PLL補正の有無によって同期誤差が大きく変化することが確認できた \\
+  エンタメ機能（F5） & ロードセル・サーボ制御 & 4 & 4 & ロードセルの荷重検知によってサーボモーターが稼働し，ベビーメリー飾りが回転することが確認できた \\
+  可変テンポ（F2） & BPM制御 & 4 & 4 & ポテンショメータによってテンポが各小節毎に変化することが確認できた \\
+  共通ライブラリ（F3.1） & PROGMEM＋I2Cフレーム & 4 & 4 & 共通ライブラリの確認と2年生間の共有を確認できた \\
+\end{longtable}
+
+\noindent
+{\small
+\begin{tabular}{ll}
+  \textbf{TRL} & \textbf{定義} \\
+  1 & 概念レベル：アイディアや原理が確立されており，説明できるレベル \\
+  2 & 基本動作レベル：単体で動作確認が可能なレベル \\
+  3 & 結合動作レベル：機能を結合し，実際の使用環境に近い環境で動作確認が可能なレベル \\
+  4 & 実運用レベル：実際の使用環境で安定的な稼働が確認できるレベル \\
+\end{tabular}
+}
+
+%-------------------------------------------------------------------
+\section{技術性能指標TPMの推移} 
+%-------------------------------------------------------------------
+MOPの各要素毎に現在の値の程度を以下に示す．
+
+\begin{longtable}{L{2cm}L{3cm}C{2cm}C{2cm}C{2cm}L{2.5cm}}
+  \toprule
+  \textbf{関連MOP} & \textbf{指標} & \textbf{目標値} & \textbf{前回値} & \textbf{今回値} & \textbf{備考} \\
+  \midrule
+  \endfirsthead
+  \toprule
+  \textbf{関連MOP} & \textbf{指標} & \textbf{目標値} & \textbf{前回値} & \textbf{今回値} & \textbf{備考} \\
+  \midrule
+  \endhead
+  \midrule
+  \endfoot
+  \bottomrule
+  \endlastfoot
+  MOP1-1 & 楽器間同期誤差（クラリネット） & $\leq 30$\,ms & -0.38 & --- & 実施済 \\
+  MOP1-2 & 楽器間同期誤差（フルート） & $\leq 30$\,ms & -0.01 & --- & 実施済 \\
+  MOP1-3 & 楽器間同期誤差（オルガン） & $\leq 30$\,ms & -0.19 & --- & 実施済 \\
+  MOP1-4 & 楽器間同期誤差（ドラム） & $\leq 30$\,ms & 0.23 & --- & 実施済 \\
+  MOP2-1 & I2C SYNCパケットロス率（クラリネット） & 0回 & 0/50 & --- & 実施済 \\
+  MOP2-2 & I2C SYNCパケットロス率（フルート） & 0回 & 0/50 & --- & 実施済 \\
+  MOP2-3 & I2C SYNCパケットロス率（オルガン） & 0回 & 0/50 & --- & 実施済 \\
+  MOP2-4 & I2C SYNCパケットロス率（ドラム） & 0回 & 0/50 & --- & 実施済 \\
+  MOP3 & 楽曲識別（中間確認） & チーム内識別 & 識別可能 & 識別可能 & 実施済 \\
+  MOP4 & 楽器識別（中間確認） & チーム内識別 & 識別可能 & 識別可能 & 実施済 \\
+  MOP5 & リラクゼーション感 & 心地よく聞こえる & --- & --- & 未実施 \\
+  MOP6 & BPM変更反映速度 & 1小節以内 & --- & --- & 未計測 \\
+\end{longtable}
+
+\subsection{現在のガントチャート}
+現在のガントチャートの状態を図\ref{fig:gc}に示す．
+灰色の箇所は実装が完了したことを示す．
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{fig/gc_current.png}
+  \caption{現在のガントチャート}
+  \label{fig:gc}
+\end{figure}
+
+\subsection{日毎の作業時間と作業内容}
+アンケート項目で必要な要素の検討と決定を行った．
+今回のアンケートでは楽器の識別，楽曲の識別，リラクゼーション効果をアンケートの実施にて調査する．
+楽器の識別では正誤を含めた選択肢を8つ，楽曲の識別では4つ用意し本システムの使用後に調査を行うこととした．
+リラクゼーション効果の検証についてはRusselの感情円環モデルを元に7段階尺度の選択肢を設定することとした．
+快-不快軸の選択肢として心地よい・不快，楽しい・退屈，明るい・暗いという3つの項目を設定した．
+そして覚醒-鎮静軸の選択肢として落ち着いた・落ち着かない，穏やかな・激しい，眠い・目が覚めたという3つの項目を設定した．
+以上の検討と決定に2時間程度を要した．
+
+%-------------------------------------------------------------------
+\section{課題管理}
+\begin{itemize}
+  \item \textbf{課題}：アンケート集計
+    \begin{itemize}
+      \item \textbf{発生原因}：アンケート項目が決定
+      \item \textbf{影響度}：高
+      \item \textbf{優先度}：高
+      \item \textbf{対策}：システム評価の会でアンケートを集計する
+      \item \textbf{期限}：7/8
+      \item \textbf{状態}：対応中
+    \end{itemize}
+\end{itemize}
+
+% \noindent
+% {\small ※影響度＝プロジェクトへのインパクト \quad ※優先度＝対応の緊急性}
+
+%-------------------------------------------------------------------
+\section{AI利用状況と検証（再現性重視）}
+Russelの感情円環モデルの調査と選択肢の検討をする際に利用した．
+
+\subsection{利用内容}
+\begin{itemize}
+  \item \textbf{利用目的}
+  形容詞対の相関がリラクゼーション効果の検証に効果的なのか，本システムに適した項目の決定を調査するために利用した．
+  \item \textbf{入力（プロンプト要旨）}
+  形容詞対の相関からリラックス効果があるかどうかを判定する方法はありますか？またその判定法において適した項目はなんですか？
+  \item \textbf{出力概要}
+  良いアプローチだと思いますが，一つダイジな設計上のポイントがあります．
+  相関分析でわかるのは「それらの項目が同じ概念（リラクゼーション）を測れているか」，つまり尺度の内部一貫性です．
+  これ自体は重要なのですが「リラックス効果があったか」を言うには比較対象が必要になります．
+  たとえば前後比較でシステム体験前と体験後に同じ形容詞対で回答してもらってスコアの変化を見る，
+  「リラックスしている状態を5とした場合に今どのあたりか」のような絶対的な基準を置くといった方式があります．
+  また，具体的な形容詞対の候補ですがリラクゼーション効果の検証に使われている既存研究をベースにすると以下のような構成が考えられます．
+  7段階尺度で，体験前後に同じセットで回答してもらう設計です．
+  快-不快軸：心地よい・不快な，楽しい・つまらない，好きな・嫌いな，
+  覚醒-鎮静軸：落ち着いた・落ち着かない，穏やかな・激しい，ゆったりした・せかせかした，
+  この構成であれば6対で回答者の負担も軽く分析時に「快-不快の次元」「覚醒-鎮静の次元」に因子が分かれることが期待できます．
+\end{itemize}
+
+\subsection{検証方法}
+
+\begin{itemize}
+  \item \textbf{検証手法}：
+    \begin{itemize}
+      \item
+      7/8のシステム評価の会でアンケートを実施し結果の集計を取る．
+    \end{itemize}
+  \item \textbf{参照資料}：
+    \begin{itemize}
+      \item
+      江川 翔一, 瀬島 吉裕, 佐藤 陽一郎. 情動評価のためのラッセルの円環モデルに基づく感情重心推定手法の提案". 日本感性工学会論文誌. 2019, 18巻(3), p.187-193. 
+    \end{itemize}
+  \item \textbf{検証手順}：
+    \begin{enumerate}
+      \item
+      手順1：システムの体験前に7段階尺度の選択肢に回答してもらう \\
+      手順2：システムの体験後楽器，楽曲の回答，体験前に回答してもらった選択肢に再度回答してもらう
+    \end{enumerate}
+\end{itemize}
+
+\subsection{ファクトチェック結果}
+\begin{itemize}
+  \item \textbf{一致点}：
+    \begin{itemize}
+      \item 
+      Russelの感情円環モデルが実際にリラクゼーション効果の推定で活用されていることを確認した．
+    \end{itemize}
+  \item \textbf{不一致・疑義}：
+    \begin{itemize}
+      \item 
+      形容詞対の項目の好きな・嫌いなという選択肢が体験によって生じた感情状態とは別に嗜好性を測るものになっていた．
+      また，穏やかな・激しいとゆったりした・せかせかしたの選択肢の意味合いが同じになっていた．
+    \end{itemize}
+  \item \textbf{最終判断}：
+  Russelの感情円環モデルを元にした選択肢を利用はするが項目に関しては自分で考え直したものを使用する．
+  \item \textbf{根拠}：
+    \begin{itemize}
+      \item 
+      リラクゼーションの測定において不要，もしくは適さない選択肢があったため実際のモデルを見ながら適した選択肢を設定する方式にした．
+    \end{itemize}
+\end{itemize}
+
+%-------------------------------------------------------------------
+\section{次回計画}
+
+\begin{itemize}
+  \item \textbf{全員}：
+    \begin{itemize}
+      \item アンケートの実施
+    \end{itemize}
+  \item \textbf{期限}：7/8（第11週）
+\end{itemize}
+
+%-------------------------------------------------------------------
+\section{その他}
+
+\begin{itemize}
+  \item 特になし
+\end{itemize}
+
+%-------------------------------------------------------------------
+\section{付録}
+
+\begin{itemize}
+  \item \textbf{添付資料}：客観的評価を実施するGoogleフォーム「\url{https://forms.gle/gSx7P9cde2A56BhK9}」
+  \item \textbf{添付範囲}：すべて
+\end{itemize}
+
+\end{document}

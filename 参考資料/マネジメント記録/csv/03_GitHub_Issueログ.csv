@@ -1,0 +1,35 @@
+﻿Issue番号,リポジトリ,タイトル,種別,担当,計画開始日,目標完了日,Status,関連WBS
+1,progress-management,機能分解構造FBS,Task,"Urban-Sea,nico0748(酒井)",2026-04-15,2026-04-29,Done,-
+2,progress-management,製品分解構造PBS,Task,"Urban-Sea,nico0748(酒井)",2026-04-23,2026-04-29,Done,-
+6,progress-management,作業分解構造WBS,Task,酒井(nyanko12),2026-04-29,2026-05-06,Done,-
+20,progress-management,sub:最終成果物の最低限ライン更新,Feature,"Urban-Sea,nico0748,Copilot",2026-05-27,2026-06-03,Done,-
+22,progress-management,sub:Slack会話履歴をZulipに移行,Task,"nico0748(酒井),nyanko12",2026-05-27,2026-06-03,Done,-
+4,orchestration-dev,フルートの機能検証,Task,山口(sioto12),2026-04-29,2026-05-13,Done,2.1.2
+1,orchestration-dev,クラリネットの機能検証,Task,佐藤(7nanasi),2026-04-29,2026-05-13,Done,2.1.3
+2,orchestration-dev,オルガンの機能検証,Task,成毛(00236168cl6q-dev),2026-04-29,2026-05-13,Done,2.1.4
+3,orchestration-dev,パーカッション(ドラム)の調査と機能検証,Task,成毛(00236168cl6q-dev),2026-04-29,2026-05-13,Done,2.1.5
+6,orchestration-dev,同期方針の策定および実装,Task,"佐藤,山口",2026-04-29,2026-05-20,Done,2.3
+10,orchestration-dev,オルガン・パーカッションの音再現(PR),PR(Merged),成毛,2026-05-13,2026-05-13,Merged,"2.1.4,2.1.5"
+13,orchestration-dev,Processing-Arduino通信方式の決定,Task,"成毛,佐藤,山口",2026-05-13,2026-05-20,Done,2.1.6
+14,orchestration-dev,Processing-Arduino通信システムの完成,Feature,"成毛,佐藤,山口",2026-05-13,2026-05-27,Done,2.1.6
+15,orchestration-dev,発表スライドの作成および発表準備,Task,全員,2026-05-13,,Done,3.4
+16,orchestration-dev,親-子Arduino-楽器-Processing間通信の完成,Feature,"成毛,佐藤,山口",2026-05-20,2026-05-27,In progress,2.x
+18,orchestration-dev,I2C試作コードとflute途中版を追加(PR),PR(Open),山口(sioto12),,,Open,2.3
+20,orchestration-dev,親-子Arduinoの通信コードの完成,Feature,"佐藤,山口",2026-05-25,2026-05-31,Done,2.3.1
+22,orchestration-dev,2.1.6 Serial制御ロジック実装,Feature,成毛,2026-06-03,2026-06-17,Done,2.1.6
+23,orchestration-dev,2.3 共通ライブラリ整備,Task,成毛,2026-05-20,2026-05-27,Done,2.3
+24,orchestration-dev,2.2 センサ入力・BPM変換処理,Feature,成毛,2026-05-27,2026-06-17,Done,2.2
+25,orchestration-dev,2.2.1 BPM変化制限ロジック,Feature,成毛,2026-06-03,2026-06-10,Done,2.2.1
+26,orchestration-dev,2.2.2 CONFIG送信処理,Feature,"佐藤,山口",2026-05-27,2026-06-03,Done,2.2.2
+27,orchestration-dev,2.2.5 サーボ制御・状態管理実装,Feature,"佐藤,山口",2026-06-10,2026-06-17,Done,2.2.5
+28,orchestration-dev,2.3.1 ISR受信・デコード処理,Feature,"佐藤,山口",2026-05-27,2026-06-10,Done,2.3.1
+29,orchestration-dev,2.3.2 PLL補正アルゴリズム,Feature,"佐藤,山口",2026-06-03,2026-06-17,Done,2.3.2
+30,orchestration-dev,2.3.3 音符スケジューリング,Feature,各楽器担当,2026-05-26,2026-05-26,Done,2.3.3
+31,orchestration-dev,2.3.4 輪唱位置管理,Feature,"佐藤,山口,成毛",2026-06-03,2026-06-17,Done,2.3.4
+33,orchestration-dev,3.1 単体・同期精度テスト,Task,全員,2026-06-10,2026-06-17,Done,3.1
+34,orchestration-dev,3.2 全体結合演奏テスト,Task,全員,2026-06-17,2026-06-24,Done,3.2
+35,orchestration-dev,3.3 可変テンポ動作検証,Task,全員,,,Done,3.3
+37,orchestration-dev,1.3 筐体制作・実装(親issue 5/5完了),Feature,"Urban-Sea,nico0748,nyanko12",2026-05-27,,Done,1.3
+38,orchestration-dev,1.4 ベビーメリー風回転装置製作,Feature,"Urban-Sea,nico0748,nyanko12",2026-06-10,,Done,1.4
+39,orchestration-dev,1.5 ロードセルの反応検証,Feature,"Urban-Sea,nico0748,nyanko12",2026-06-10,2026-06-17,Done,1.4
+49,orchestration-dev,BPM変化制御ロジックをmaster/slaveに追加(PR),PR(Merged),成毛,2026-06-10,2026-06-10,Merged,2.2

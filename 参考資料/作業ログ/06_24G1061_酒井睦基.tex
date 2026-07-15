@@ -1,0 +1,209 @@
+\documentclass[a4paper,12pt]{ltjsarticle}
+\usepackage[top=25mm,bottom=25mm,left=25mm,right=25mm]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{graphicx}
+
+\setlist[itemize]{leftmargin=2em}
+\setlist[itemize,2]{leftmargin=2em}
+\setlist[enumerate]{leftmargin=2em}
+\setlist[enumerate,2]{leftmargin=2em}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+% セクション見出しのスタイル
+\titleformat{\section}{\large\bfseries}{第\thesection 節}{1em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
+
+\begin{document}
+
+% ヘッダ情報
+\begin{center}
+  {\LARGE\bfseries 作業ログ}
+\end{center}
+
+\vspace{4mm}
+
+\begin{tabular}{ll}
+  \textbf{報告者} & 酒井 睦基 \\
+  \textbf{報告日} & \today \\
+  \textbf{プロジェクト名} & Arduino オーケストラ：きらきら星 輪唱演奏システム \\
+\end{tabular}
+
+\vspace{6mm}
+
+%-------------------------------------------------------------------
+\section{進捗サマリー（要約）}
+
+\begin{itemize}
+  \item \textbf{全体進捗率}：20 [\%]
+  \item \textbf{マイルストーン達成状況}：達成
+  \item \textbf{主要成果}：
+    \begin{itemize}
+      \item 楽器音のデータの調査が完了し，Processingによる音声合成器の実装とスペクトル比較による倍音比率などの修正を確認
+    \end{itemize}
+  \item \textbf{重大課題（影響度：高）}：ベビーメリーの設計，作成，確認作業を3年が主体となって行う必要あり
+  \item \textbf{重大課題（影響度：高）}：共通ライブラリの設計を優先する必要あり
+  \item \textbf{重大課題（影響度：低）}：各楽器音の細かな修正の余地あり
+\end{itemize}
+
+%-------------------------------------------------------------------
+\section{作業ログ（詳細トラッキング）}
+
+\begin{longtable}{C{2cm}C{1.6cm}C{1.6cm}C{2.2cm}C{1.2cm}L{2.4cm}L{3cm}}
+  \toprule
+  \textbf{作業項目} & \textbf{開始日} & \textbf{予定完了日} & \textbf{状態} & \textbf{進捗率} & \textbf{依存関係・ブロッカー} & \textbf{コメント} \\
+  \midrule
+  \endfirsthead
+  \toprule
+  \textbf{作業項目} & \textbf{開始日} & \textbf{予定完了日} & \textbf{状態} & \textbf{進捗率} & \textbf{依存関係・ブロッカー} & \textbf{コメント} \\
+  \midrule
+  \endhead
+  \midrule
+  \endfoot
+  \bottomrule
+  \endlastfoot
+  各担当の楽器の音色作成 & 5/20 & 6/10 & 進行中 & 60\% & 2年生全員の完了報告待ち & 各楽器の倍音構成の調査の確認が完了し，Processingを用いた楽器音の出力まで確認できた \\
+  共通ライブラリの作成 & 5/20 & 6/2 & 進行中 & - & 成毛の完了報告待ち & 共通ライブラリの実装の進捗度がわからないため確認する \\
+\end{longtable}
+
+\subsection{現在のガントチャート}
+現在のガントチャートの状態を図\ref{fig:gc}に示す．
+灰色の箇所は実装が完了していることを示す．
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{new_gant.png}
+  \caption{現在のガントチャート}
+  \label{fig:gc}
+\end{figure}
+
+\subsection{日毎の作業時間と作業内容}
+定期的にGitHubを確認しPRがきていないかどうかを確認する．
+PRがきていた場合はファイルの内容をレビューし，問題がない場合はmergeする．
+基本的な作業時間はGitHubの確認とコードレビューを含め1時間程度である．
+
+%-------------------------------------------------------------------
+\section{課題管理}
+\begin{itemize}
+  \item \textbf{課題}：共通ライブラリ整備の進捗不明
+    \begin{itemize}
+      \item \textbf{発生原因}：WBS 2.3（成毛担当）の進捗報告がない
+      \item \textbf{影響度}：高
+      \item \textbf{優先度}：高
+      \item \textbf{対策}：5/27のMTGで成毛に進捗確認を行う．未着手の場合はスケジュール修正を検討する．
+      \item \textbf{期限}：5/27
+      \item \textbf{状態}：未対応
+    \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+  \item \textbf{課題}：筐体設計
+    \begin{itemize}
+      \item \textbf{発生原因}：材料の決定が必要
+      \item \textbf{影響度}：高
+      \item \textbf{優先度}：高
+      \item \textbf{対策}：3年生が主体となり5/27のMTGで材料と不足しているセンサ入手の日程を立てる．モック作成の担当もここで決定する．
+      \item \textbf{期限}：6/9
+      \item \textbf{状態}：未対応
+    \end{itemize}
+\end{itemize}
+
+% \noindent
+% {\small ※影響度＝プロジェクトへのインパクト \quad ※優先度＝対応の緊急性}
+
+%-------------------------------------------------------------------
+\section{AI利用状況と検証（再現性重視）}
+tex作成でのみAIを用いたため，検証方法とファクトチェック結果を省く．
+
+\subsection{利用内容}
+\begin{itemize}
+  \item \textbf{利用目的}：texのテンプレートの作成
+  \item \textbf{入力（プロンプト要旨）}：作業ログ.pdfを元にtexのテンプレートを作成して．
+  \item \textbf{出力概要}：このtexファイルが出力された．
+\end{itemize}
+
+\subsection{検証方法}
+
+\begin{itemize}
+  \item \textbf{検証手法}：
+    \begin{itemize}
+      \item 実験／比較／理論確認など
+    \end{itemize}
+  \item \textbf{参照資料}：
+    \begin{itemize}
+      \item 論文・書籍・公式ドキュメント等
+    \end{itemize}
+  \item \textbf{検証手順}：
+    \begin{enumerate}
+      \item 手順1
+      \item 手順2
+    \end{enumerate}
+\end{itemize}
+
+\subsection{ファクトチェック結果}
+\begin{itemize}
+  \item \textbf{一致点}：
+    \begin{itemize}
+      \item 既存知識と整合している部分
+    \end{itemize}
+  \item \textbf{不一致・疑義}：
+    \begin{itemize}
+      \item 差異の内容
+    \end{itemize}
+  \item \textbf{最終判断}：採用／保留／棄却
+  \item \textbf{根拠}：
+    \begin{itemize}
+      \item 資料・理由
+    \end{itemize}
+\end{itemize}
+
+%-------------------------------------------------------------------
+\section{次回計画}
+
+\begin{itemize}
+  \item \textbf{3年生}：
+    \begin{itemize}
+      \item WBS 1.3：ベビーメリー風装置の設計・製作
+    \end{itemize}
+  \item \textbf{2年生}：
+    \begin{itemize}
+      \item WBS 2.1.2〜2.1.5：各楽器音色作成（完成）
+      \item WBS 2.1.6：Serial通信・制御ロジック実装
+      \item WBS 2.2〜2.2.3：マスタ側同期制御実装（成毛・佐藤・山口）
+    \end{itemize}
+  \item \textbf{期限}：6/9（第7週末）
+\end{itemize}
+
+%-------------------------------------------------------------------
+\section{その他}
+
+\begin{itemize}
+  \item 特になし
+\end{itemize}
+
+%-------------------------------------------------------------------
+\section{付録}
+
+\begin{itemize}
+  \item \textbf{添付資料}：
+    \begin{itemize}
+      \item GitHub（進捗が前倒しのため通信設計を早めに実装してもらっている）
+
+      \begin{figure}[htbp]
+        \centering
+        \includegraphics[width=\linewidth]{issue.png}
+        \caption{GitHubのissueの例}
+        \label{fig:is}
+      \end{figure}
+    \end{itemize}
+  \item \textbf{添付範囲}：一部
+\end{itemize}
+
+\end{document}
